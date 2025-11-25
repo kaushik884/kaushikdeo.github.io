@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaushik Deo | Robotics Engineer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #020204;
+            --card-bg: rgba(15, 20, 25, 0.95);
+            --card-border: rgba(0, 243, 255, 0.2);
+            --accent-color: #00f3ff;
+            --secondary-accent: #7d00ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --terminal-bg: #0a0a0a;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden; /* Hide horizontal scroll */
+            line-height: 1.6;
+        }
+
+        /* --- THREE.JS BACKGROUND --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -2;
+        }
+        #bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(2, 2, 4, 0.85) 80%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- NAV & HEADER --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(2, 2, 4, 0.7);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .logo::after { content: '_'; animation: blink 1s infinite; color: var(--accent-color); }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 10%;
+        }
+        .hero h2.intro { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.2rem; margin-bottom: 20px; }
+        .hero h1 { font-size: 5rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px; letter-spacing: -2px; }
+        .hero h2.role { font-size: 3rem; color: var(--text-secondary); margin-bottom: 30px; opacity: 0.8; }
+        .hero p { max-width: 550px; font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 50px; background: rgba(0,0,0,0.4); padding: 10px; border-left: 3px solid var(--accent-color); }
+        
+        .cta-container { display: flex; gap: 20px; }
+        .btn { padding: 15px 35px; border: 1px solid var(--accent-color); color: var(--accent-color); text-decoration: none; font-family: var(--font-mono); font-weight: 700; transition: all 0.3s; background: rgba(0, 243, 255, 0.05); }
+        .btn:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 30px rgba(0, 243, 255, 0.4); }
+
+        /* --- STATS --- */
+        .stats-bar { display: flex; justify-content: space-around; padding: 60px 10%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); margin-bottom: 50px; }
+        .stat-num { font-family: var(--font-mono); font-size: 2.5rem; font-weight: 700; color: var(--text-primary); display: block; text-align: center; }
+        .stat-label { font-size: 0.85rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; }
+
+        /* --- SECTIONS --- */
+        section { padding: 80px 10%; }
+        .section-title { font-family: var(--font-mono); font-size: 2rem; margin-bottom: 60px; display: flex; align-items: center; }
+        .section-title span { color: var(--accent-color); margin-right: 15px; }
+        .section-title::after { content: ""; flex-grow: 1; height: 1px; background: linear-gradient(90deg, var(--card-border), transparent); margin-left: 20px; }
+
+        /* --- ACCORDION --- */
+        .accordion-item { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 25px; border-radius: 8px; overflow: hidden; transition: all 0.3s ease; }
+        .accordion-item:hover { border-color: var(--accent-color); transform: translateX(10px); }
+        .accordion-header { padding: 30px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-header h3 { font-size: 1.4rem; color: var(--text-primary); }
+        .accordion-meta { font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--terminal-bg); border-top: 1px solid rgba(255,255,255,0.05); }
+        .terminal-window { padding: 25px; font-family: var(--font-mono); font-size: 0.9rem; color: #d4d4d4; }
+        .terminal-line { display: flex; margin-bottom: 12px; }
+        .terminal-prompt { color: var(--accent-color); margin-right: 15px; }
+
+        /* --- SKILLS & EDUCATION --- */
+        .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .skill-box { background: var(--card-bg); padding: 30px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .skill-box h3 { color: var(--accent-color); margin-bottom: 20px; font-family: var(--font-mono); font-size: 1.1rem; }
+        .tech-list { display: flex; flex-wrap: wrap; gap: 12px; }
+        .tech-item { background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 4px; font-size: 0.9rem; transition: 0.3s; border: 1px solid transparent; }
+        .tech-item:hover { background: rgba(0, 243, 255, 0.1); border-color: var(--accent-color); color: var(--text-primary); }
+
+        /* Education Logos */
+        .edu-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px; }
+        .edu-logo-placeholder { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 2px solid var(--accent-color); }
+        .edu-logo-img { width: 80%; height: 80%; object-fit: contain; }
+        .edu-details .degree { color: var(--accent-color); font-family: var(--font-mono); font-size: 0.85rem; display: block; }
+        .edu-details .year { color: var(--text-secondary); font-size: 0.8rem; }
+
+        /* Projects */
+        .img-placeholder { width: 100%; height: 250px; border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; }
+        .img-placeholder:hover { border-color: var(--accent-color); background: rgba(0, 243, 255, 0.05); }
+
+        /* Footer */
+        footer { text-align: center; padding: 80px 0; color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.85rem; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @media (max-width: 768px) { .hero h1 { font-size: 3rem; } section { padding: 60px 5%; } .nav-links { display: none; } .stats-bar { flex-direction: column; gap: 30px; } }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="bg-overlay"></div>
+
+    <nav>
+        <div class="logo">Kaushik Deo</div>
+        <div class="nav-links">
+            <a href="#about">// About</a>
+            <a href="#experience">// Experience</a>
+            <a href="#projects">// Work</a>
+            <a href="#education">// Education</a>
+            <a href="#contact">// Contact</a>
+        </div>
+    </nav>
+
+    <div class="hero" id="about">
+        <h2 class="intro">Hello, world. I am</h2>
+        <h1>Kaushik Deo.</h1>
+        <h2 class="role">Building Autonomous Systems.</h2>
+        <p>            Robotics Software Engineer specializing in <strong>SLAM, Perception, Planning and Sensor Fusion</strong>. 
+            Whether it's warehouse automation, field robotics, or autonomous inspection - I build systems that don't just 
+            work in simulation, but thrive when reality hits hard.</p>
+        <div class="cta-container">
+            <a href="#projects" class="btn">View Work</a>
+            <a href="#contact" class="btn" style="background:transparent; color:#fff; border-color:#fff;">Contact Me</a>
+        </div>
+    </div>
+
+    <section id="experience">
+        <h2 class="section-title"><span>01.</span> Experience</h2>
+        
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Robotics Software Engineer Intern</h3>
+                    <div class="accordion-meta">
+                        <span class="company">ArcBest Technologies</span> | Jun 2025 - Aug 2025
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window">
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Developed Vaux Vision (Camera-based RTLS) achieving 10cm accuracy.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Deployed dockerized RTAB-Map SLAM on forklifts (95% confidence).</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Optimized mapping compute usage by 55% for efficient tracking.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Achievement: 15 mph autonomous operation speeds.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Robotics Research Assistant</h3>
+                    <div class="accordion-meta">
+                        <span class="company">Silicon Synapse Lab</span> | Jan 2025 - Apr 2025
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window">
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Hardware: Boston Dynamics Spot, Unitree Go2/B2-W.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Task: Dual-IMU & Stereo Camera Calibration (MATLAB).</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Mapped 15 acres of campus environments.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">></span> Benchmarked ORB-SLAM3 vs FAST-LIO2 for drift & trajectory.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="projects">
+        <h2 class="section-title"><span>02.</span> Projects</h2>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Drone Trajectory Optimization</h3>
+                    <div class="accordion-meta">Python, GTSAM, OpenCV</div>
+                </div>
+                <i class="fa-solid fa-code-branch" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-diagram-project" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Factor Graph Visualization ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Refined camera poses for a 250-image dataset using SIFT features and GTSAM bundle adjustment.</p>
+                    <p style="color: var(--accent-color);">> Result: 30% reduction in pose estimation error.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Multi-Image 3D Reconstruction</h3>
+                    <div class="accordion-meta">Python, GTSAM, OpenCV</div>
+                </div>
+                <i class="fa-solid fa-code-branch" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-diagram-project" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Factor Graph Visualization ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Refined camera poses for a 250-image dataset using SIFT features and GTSAM bundle adjustment.</p>
+                    <p style="color: var(--accent-color);">> Result: 30% reduction in pose estimation error.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Factor Graph Optimization</h3>
+                    <div class="accordion-meta">Python, GTSAM, OpenCV</div>
+                </div>
+                <i class="fa-solid fa-code-branch" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-diagram-project" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Factor Graph Visualization ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Refined camera poses for a 250-image dataset using SIFT features and GTSAM bundle adjustment.</p>
+                    <p style="color: var(--accent-color);">> Result: 30% reduction in pose estimation error.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>GPS & IMU Sensor Fusion for Automotive Dead Reckoning</h3>
+                    <div class="accordion-meta">ROS2, Kalman Filters</div>
+                </div>
+                <i class="fa-solid fa-robot" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-location-crosshairs" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Rviz Screenshot ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Implemented an Extended Kalman Filter (EKF) to fuse GPS and IMU data. Calibrated hard/soft iron magnetometer data.</p>
+                    <p style="color: var(--accent-color);">> Result: 2-meter localization accuracy.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>Reinforcement Learning Algorithms in OpenAI Gym</h3>
+                    <div class="accordion-meta">ROS2, Kalman Filters</div>
+                </div>
+                <i class="fa-solid fa-robot" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-location-crosshairs" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Rviz Screenshot ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Implemented an Extended Kalman Filter (EKF) to fuse GPS and IMU data. Calibrated hard/soft iron magnetometer data.</p>
+                    <p style="color: var(--accent-color);">> Result: 2-meter localization accuracy.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
+                    <h3>AI Maths Olympiad</h3>
+                    <div class="accordion-meta">ROS2, Kalman Filters</div>
+                </div>
+                <i class="fa-solid fa-robot" style="color: var(--accent-color)"></i>
+            </div>
+            <div class="accordion-body">
+                <div class="terminal-window" style="background: #0f1115;">
+                    <div class="img-placeholder">
+                        <i class="fa-solid fa-location-crosshairs" style="font-size: 3rem; margin-bottom: 15px; color: var(--accent-color);"></i>
+                        <span>[ PLACEHOLDER: Insert Rviz Screenshot ]</span>
+                    </div>
+                    <p style="margin-bottom: 10px;">Implemented an Extended Kalman Filter (EKF) to fuse GPS and IMU data. Calibrated hard/soft iron magnetometer data.</p>
+                    <p style="color: var(--accent-color);">> Result: 2-meter localization accuracy.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section id="education">
+        <h2 class="section-title"><span>03.</span> Education</h2>
+        <div class="skills-container"> 
+            
+            <div class="skill-box">
+                <div class="edu-header">
+                    <div class="edu-logo-placeholder">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ10fz1oxY8RViP5XVwjbJ1eydL_L9PT2ZHDQ&sAHkvORsumFQsAAAAAElFTkSuQmCCySa4depS32kAAAAAElFTkSuQmCC" 
+                             alt="Northeastern University Logo" 
+                             class="edu-logo-img">
+                    </div>
+                    
+                    <div class="edu-details">
+                        <h3 class="uni">Northeastern University</h3>
+                        <span class="degree">Master of Science, Robotics, Computer Science</span>
+                        <i class="fa-solid fa-university"></i>
+                        <span class="year">2024 - 2026</span>
+                    </div>
+                </div>
+                
+                <span class="course-label">Relevant Courses:</span>
+                <div class="tech-list">
+                    <div class="tech-item">Autonomous Field Robotics</div>
+                    <div class="tech-item">Robotics Sensing and Navigation</div>
+                    <div class="tech-item">Reinforcement Learning</div>
+                    <div class="tech-item">Foundations of AI</div>
+                    <div class="tech-item">Robotics Science and Systems</div>
+                </div>
+            </div>
+
+            <div class="skill-box">
+                <div class="edu-header">
+                    <div class="edu-logo-placeholder">
+                        <img src="data:image/png;base64,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" 
+                             alt="SPPU Logo" 
+                             class="edu-logo-img">
+                    </div>
+                    
+                    <div class="edu-details">
+                        <h3 class="uni">Savitribai Phule Pune University</h3>
+                        <span class="degree">Bachelor of Engineering, Mechanical Engineering</span>
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        <span class="year">2018 - 2022</span>
+                    </div>
+                </div>
+
+                <span class="course-label">Relevant Courses:</span>
+                <div class="tech-list">
+                    <div class="tech-item">Robotics</div>
+                    <div class="tech-item">Mechatronics</div>
+                    <div class="tech-item">Control Theory</div>
+                    <div class="tech-item">Robot Mechanics</div>
+                    <div class="tech-item">Numerical Methods for Optimization</div>
+                    <div class="tech-item">Fundamental Programming Languages</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="skills">
+        <h2 class="section-title"><span>04.</span> Tech Stack</h2>
+        <div class="skills-container">
+            
+            <div class="skill-box">
+                <h3><i class="fa-solid fa-code"></i> Languages</h3>
+                <div class="tech-list">
+                    <div class="tech-item"><i class="devicon-python-plain"></i> Python</div>
+                    <div class="tech-item"><i class="devicon-cplusplus-plain"></i> C++</div>
+                    <div class="tech-item"><i class="devicon-matlab-plain"></i> MATLAB</div>
+                    <div class="tech-item"><i class="devicon-csharp-plain"></i> C#</div>
+                    <div class="tech-item"><i class="devicon-mysql-plain"></i> SQL</div>
+                    <div class="tech-item"><i class="devicon-javascript-plain"></i> JavaScript</div>
+                </div>
+            </div>
+
+            <div class="skill-box">
+                <h3><i class="fa-solid fa-robot"></i> Robotics</h3>
+                <div class="tech-list">
+                    <div class="tech-item"><i class="fa-solid fa-circle-nodes"></i> ROS2</div>
+                    <div class="tech-item"><i class="fa-solid fa-map"></i> SLAM</div>
+                    <div class="tech-item"><i class="fa-solid fa-eye"></i> OpenCV</div>
+                    <div class="tech-item"><i class="fa-solid fa-cube"></i> Gazebo</div>
+                    <div class="tech-item"><i class="fa-solid fa-cube"></i> MuJoCo</div>
+                    <div class="tech-item"><i class="fa-solid fa-network-wired"></i> Sensor Fusion</div>
+                </div>
+            </div>
+
+            <div class="skill-box">
+                <h3><i class="fa-solid fa-toolbox"></i> Tools</h3>
+                <div class="tech-list">
+                    <div class="tech-item"><i class="devicon-docker-plain"></i> Docker</div>
+                    <div class="tech-item"><i class="devicon-linux-plain"></i> Linux</div>
+                    <div class="tech-item"><i class="devicon-git-plain"></i> Git</div>
+                    <div class="tech-item"><i class="devicon-foxglove-plain"></i> Foxglove</div>
+                    <div class="tech-item"><i class="devicon-rviz2-plain"></i> Rviz2</div>
+                    <div class="tech-item"><i class="devicon-pytorch-original"></i> PyTorch</div>
+                    <div class="tech-item"><i class="devicon-tensorflow-original"></i> TensorFlow</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-num" data-target="15">0</span>
+            <span class="stat-label">Acres Mapped</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="95">0</span>
+            <span class="stat-label">% Accuracy Achieved</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="6">0</span>
+            <span class="stat-label">Major Projects and counting</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="100">0</span>
+            <span class="stat-label">% Passion</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="100">0</span>
+            <span class="stat-label">Number of coffees</span>
+        </div>
+    </div>
+    <section id="contact" style="text-align: center; margin-top: 50px;">
+        <h2 style="font-size: 3rem; margin-bottom: 20px;">Ready to Collaborate?</h2>
+        <a href="mailto:deo.ka@northeastern.edu" class="btn" style="padding: 20px 50px; font-size: 1.2rem;">Initialize Contact</a>
+    </section>
+
+    <footer>
+        <div>Designed & Built by Kaushik Deo</div>
+        <div style="margin-top: 20px; font-size: 1.5rem;">
+            <a href="https://www.github.com/kaushik884" target="_blank" style="color: var(--text-secondary); margin: 0 15px;"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/kaushik-deo-71bbaa1b1/" target="_blank" style="color: var(--text-secondary); margin: 0 15px;"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // --- UI INTERACTION ---
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+            var body = element.querySelector('.accordion-body');
+            var icon = element.querySelector('.fa-chevron-down');
+            if (body.style.maxHeight) { body.style.maxHeight = null; if(icon) icon.style.transform = "rotate(0deg)"; } 
+            else { body.style.maxHeight = body.scrollHeight + "px"; if(icon) icon.style.transform = "rotate(180deg)"; }
+        }
+
+        const stats = document.querySelectorAll('.stat-num');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = +entry.target.getAttribute('data-target');
+                    let count = 0;
+                    const inc = target / 50; 
+                    const updateCount = () => { count += inc; if (count < target) { entry.target.innerText = Math.ceil(count); requestAnimationFrame(updateCount); } else { entry.target.innerText = target; } };
+                    updateCount(); observer.unobserve(entry.target);
+                }
+            });
+        });
+        stats.forEach(stat => observer.observe(stat));
+
+        // =========================================================
+        // === THREE.JS: OUTDOOR TO WAREHOUSE TRANSITION LOGIC ===
+        // =========================================================
+        
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020204, 0.003);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 40, 80);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // --- 1. SETUP POINTS ---
+        const particleCount = 25000;
+        const geometry = new THREE.BufferGeometry();
+        
+        // We need Arrays to store: 
+        // 1. Initial (Outdoor) Position
+        // 2. Target (Warehouse) Position
+        // 3. Initial Color
+        // 4. Target Color
+        
+        const initialPositions = new Float32Array(particleCount * 3);
+        const targetPositions = new Float32Array(particleCount * 3);
+        const initialColors = new Float32Array(particleCount * 3);
+        const targetColors = new Float32Array(particleCount * 3);
+        const currentPositions = new Float32Array(particleCount * 3);
+        const currentColors = new Float32Array(particleCount * 3);
+
+        const colorObj = new THREE.Color();
+
+        for (let i = 0; i < particleCount; i++) {
+            // --- OUTDOOR STATE (Wavy Terrain) ---
+            const x = (Math.random() - 0.5) * 300;
+            const z = (Math.random() - 0.5) * 300;
+            const y = Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8 + (Math.random() * 2);
+
+            initialPositions[i*3] = x;
+            initialPositions[i*3+1] = y;
+            initialPositions[i*3+2] = z;
+
+            // Outdoor Color: Rainbow based on height
+            const hNorm = (y + 10) / 20;
+            colorObj.setHSL(0.7 - (hNorm * 0.7), 1.0, 0.5);
+            initialColors[i*3] = colorObj.r;
+            initialColors[i*3+1] = colorObj.g;
+            initialColors[i*3+2] = colorObj.b;
+
+            // --- INDOOR STATE (Structured Warehouse) ---
+            // We divide points into: Floor (60%), Walls/Shelves (40%)
+            let tx, ty, tz;
+            let tr, tg, tb;
+
+            if (Math.random() > 0.8) {
+                // FLOOR: Flat grid
+                tx = (Math.random() - 0.5) * 150;
+                tz = (Math.random() - 0.5) * 150;
+                ty = -10; // Flat floor
+                
+                // Color: Dark Blue/Grid lines
+                if (Math.abs(tx) % 20 < 1 || Math.abs(tz) % 20 < 1) {
+                     colorObj.setHex(0x00f3ff); // Cyan Grid lines
+                } else {
+                     colorObj.setHex(0x111111); // Dark floor
+                }
+            } else {
+                // SHELVES & WALLS
+                // Create aisles: X positions at -40, -20, 20, 40
+                const aisle = Math.floor(Math.random() * 4) - 2; // -2, -1, 0, 1
+                let aisleX = (aisle + 0.5) * 40; 
+                
+                tx = aisleX + (Math.random() - 0.5) * 5; // Shelf width
+                tz = (Math.random() - 0.5) * 200; // Shelf length
+                ty = (Math.random() * 30) - 10; // Height (-10 to 20)
+                
+                // Color: Orange/Industrial for shelves
+                // Make layers
+                if (Math.abs(ty + 10) % 10 < 1) {
+                    colorObj.setHex(0xffaa00); // Orange shelf levels
+                } else {
+                    colorObj.setHex(0x555555); // Gray structure
+                }
+            }
+
+            targetPositions[i*3] = tx;
+            targetPositions[i*3+1] = ty;
+            targetPositions[i*3+2] = tz;
+            
+            targetColors[i*3] = colorObj.r;
+            targetColors[i*3+1] = colorObj.g;
+            targetColors[i*3+2] = colorObj.b;
+
+            // Initialize Current to Initial
+            currentPositions[i*3] = x;
+            currentPositions[i*3+1] = y;
+            currentPositions[i*3+2] = z;
+            currentColors[i*3] = initialColors[i*3];
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(currentPositions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(currentColors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.6,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending
+        });
+
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        // --- 2. ROBOT SETUP ---
+        const robotGroup = new THREE.Group();
+        const chassis = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 6), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+        const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4, 1.5, 6)), new THREE.LineBasicMaterial({ color: 0x00f3ff }));
+        chassis.add(edges);
+        const lidar = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.8, 16), new THREE.MeshBasicMaterial({ color: 0x333333 }));
+        lidar.position.y = 1.2;
+        const scanLine = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.9), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+        scanLine.position.set(0.4, 0.5, 0);
+        lidar.add(scanLine);
+        robotGroup.add(chassis);
+        robotGroup.add(lidar);
+        scene.add(robotGroup);
+
+        // --- 3. SCROLL & ANIMATION LOGIC ---
+        
+        let scrollPercent = 0;
+        let smoothedScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            // Calculate how far down we are (0.0 to 1.0)
+            // We max out the transition when we reach the bottom
+            const bodyH = document.body.scrollHeight - window.innerHeight;
+            const rawProgress = window.scrollY / bodyH;
+
+            // SCROLL MAPPING: 
+            // We divide by 0.7 so the value hits 1.0 faster.
+            // We use Math.min to cap it at 1.0 so it doesn't "over-morph".
+            scrollPercent = Math.min(rawProgress / 0.25, 1.0);
+        });
+
+        // Helper for terrain height (Outdoor logic)
+        function getTerrainHeight(x, z) { return Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8; }
+
+        // Helper: Linear Interpolation
+        function lerp(start, end, t) { return start * (1 - t) + end * t; }
+
+        let time = 0;
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', e => { mouseX = (e.clientX - window.innerWidth/2)*0.05; mouseY = (e.clientY - window.innerHeight/2)*0.05; });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // 1. Smooth Scroll Transition
+            // Lerp current scroll value to target for buttery smooth effect
+            smoothedScroll += (scrollPercent - smoothedScroll) * 0.75;
+
+            // 2. MORPH POINTS
+            const posAttr = points.geometry.attributes.position;
+            const colAttr = points.geometry.attributes.color;
+
+            // Only update if there is significant change or movement
+            for (let i = 0; i < particleCount; i++) {
+                const ix = i * 3;
+                
+                // Interpolate Position
+                posAttr.array[ix] = lerp(initialPositions[ix], targetPositions[ix], smoothedScroll);
+                posAttr.array[ix+1] = lerp(initialPositions[ix+1], targetPositions[ix+1], smoothedScroll);
+                posAttr.array[ix+2] = lerp(initialPositions[ix+2], targetPositions[ix+2], smoothedScroll);
+
+                // Interpolate Color
+                colAttr.array[ix] = lerp(initialColors[ix], targetColors[ix], smoothedScroll);
+                colAttr.array[ix+1] = lerp(initialColors[ix+1], targetColors[ix+1], smoothedScroll);
+                colAttr.array[ix+2] = lerp(initialColors[ix+2], targetColors[ix+2], smoothedScroll);
+            }
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
+
+            // 3. ROBOT MOVEMENT
+            // It moves in a Lissajous curve
+            const rX = Math.sin(time * 0.5) * 30;
+            const rZ = Math.cos(time * 0.3) * 40;
+            
+            // Look ahead
+            const nextX = Math.sin((time + 0.1) * 0.5) * 30;
+            const nextZ = Math.cos((time + 0.1) * 0.3) * 40;
+
+            // ROBOT HEIGHT LOGIC:
+            // Outdoor: y = terrainHeight + 2.5
+            // Indoor: y = -10 (Flat floor) + 2.5
+            const terrainY = getTerrainHeight(rX, rZ);
+            const floorY = -10;
+            
+            // Blend robot height based on scroll
+            const currentY = lerp(terrainY, floorY, smoothedScroll) + 2.5;
+            const lookY = lerp(getTerrainHeight(nextX, nextZ), floorY, smoothedScroll) + 2.5;
+
+            robotGroup.position.set(rX, currentY, rZ);
+            robotGroup.lookAt(nextX, lookY, nextZ);
+
+            // 4. GENERAL SCENE
+            points.rotation.y += 0.002; // Very slow rotate
+            lidar.rotation.y += 0.2;
+            
+            // Camera Sway
+            camera.position.x += (mouseX - camera.position.x) * 0.02;
+            camera.position.y += (40 + mouseY * 0.2 - camera.position.y) * 0.02;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
