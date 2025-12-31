@@ -677,6 +677,56 @@
         <div class="accordion-item" onclick="toggleAccordion(this)">
             <div class="accordion-header">
                 <div>
+                    <h3>Targetless Camera-LiDAR SpatioTemporal Calibration</h3>
+                    <div class="accordion-meta">
+                        <span class="company">Implementing a dual loss function on segmented road vehicles to perform targetless Camera-LiDAR spatio-temporal calibration</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
+            </div>
+            
+            <div class="accordion-body">
+                <div class="exp-content-wrapper">
+                    <div class="exp-text-col">
+                        
+                        <div class="log-header color-fix">
+                            [Camera Image Segmentation and LiDAR point cloud Segmentation]
+                        </div>
+                        <div class="log-body">
+                            <p>> Integrated SalsaNext and DeepLabV3 models to segment vehicles in 3D point clouds and 2D images respectively.</p>
+                            <p>> Performed point to pixel and pixel to point correspondence mapping for spatio-temporal calibration.</p>
+                        </div>
+                        <div class="log-header color-fix">
+                            [Dual Loss Function Implementation]
+                        </div>
+                        <div class="log-body">
+                            <p>> Designed a dual loss function with DBSCAN clustering matching LiDAR points with image segmentation masks.</p>
+                            <p>> Converted temporal loss to spatial loss for joint spatio-temporal calibration.</p>
+                        </div>
+                        <div class="log-header color-fix">
+                            [Multi-Stage optimization]
+                        </div>
+                        <div class="log-body">
+                            <p>> Applied a multistage coarse-to-fine optimization strategy with weight scheduling for improved calibration accuracy.</p>
+                            <p>> Achieved a final calibration error of 2.6 cm spatial error and 10ms temproal error.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="exp-img-col">
+                        <div class="job-img">
+                            <img src="before_calib.png" alt="Spot Robot" onerror="this.style.display='none'">
+                        </div>
+                        <div class="job-img">
+                            <img src="after_calib.png" alt="Spot Robot" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+                <div>
                     <h3>Sensor Fusion using Kalman Filter for Automotive Dead Reckoning</h3>
                     <div class="accordion-meta">
                         <span class="company">Implementing a robust Kalman Filter for fusing GPS and IMU sensor data capable of performing in GPS-blackout environments </span>
@@ -693,8 +743,8 @@
                             [IMU Calibration & Data Processing]
                         </div>
                         <div class="log-body">
-                            <p>> Parsed and synchronized asynchronous ROS bag data streams</p>
-                            <p>> Implemented static bias calibration logic to identify and subtract accelerometer and gyroscope errors </p>
+                            <p>> Parsed and synchronized asynchronous ROS bag data streams.</p>
+                            <p>> Implemented static bias calibration logic to identify and subtract accelerometer and gyroscope errors. </p>
                         </div>
                         <div class="log-header color-fix">
                             [Sensor Fusion Algorithm Development]
@@ -702,14 +752,14 @@
                         <div class="log-body">
                             <p>> Designed and implemented a custom 6-state Kalman Filter in Python to fuse high-frequency (200Hz) IMU data with low-frequency (8Hz) GPS updates. </p>
                             <p>> The filter successfully estimated 2D pose (position, heading) and velocity by integrating body-frame
-                                 acceleration and angular velocity while correcting for drift using GPS measurements </p>
+                                 acceleration and angular velocity while correcting for drift using GPS measurements. </p>
                         </div>
                         <div class="log-header color-fix">
                             [Dead Reckoning in GNSS-Denied Environments]
                         </div>
                         <div class="log-body">
                             <p>> Engineered a robust state estimation pipeline capable of handling extended GPS signal outages.</p>
-                            <p>> Successfully tracked vehicle trajectory during a 460-second tunnel passage by shifting to IMU-based dead reckoning</p>
+                            <p>> Successfully tracked vehicle trajectory during a 460-second tunnel passage by shifting to IMU-based dead reckoning.</p>
                         </div>
                     </div>
                     
