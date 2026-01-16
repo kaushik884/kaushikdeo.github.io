@@ -4,23 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaushik Deo | Robotics Engineer</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <style>
         :root {
-            --bg-color: #020204;
-            --card-bg: rgba(15, 20, 25, 0.95);
-            --card-border: rgba(0, 243, 255, 0.2);
-            --accent-color: #00f3ff;
-            --secondary-accent: #7d00ff;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --terminal-bg: #0a0a0a;
+            --bg-color: #FAFAF8;
+            --bg-secondary: #F2F1EE;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --card-border: #E5E4E1;
+            --accent-color: #C75D38;
+            --accent-hover: #A84D2E;
+            --text-primary: #1A1A1A;
+            --text-secondary: #5C5C5C;
+            --text-tertiary: #8A8A8A;
             --font-mono: 'JetBrains Mono', monospace;
             --font-sans: 'Inter', sans-serif;
+            --sidebar-width: 280px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,1252 +30,1482 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-family: var(--font-sans);
-            overflow-x: hidden; /* Hide horizontal scroll */
             line-height: 1.6;
         }
 
-        /* --- THREE.JS BACKGROUND --- */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: -2;
-        }
-        #bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(2, 2, 4, 0.85) 80%);
-            z-index: -1;
-            pointer-events: none;
+        /* === LAYOUT === */
+        .layout {
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* --- NAV & HEADER --- */
-        nav {
+        /* === SIDEBAR === */
+        .sidebar {
+            width: var(--sidebar-width);
             position: fixed;
             top: 0;
-            width: 100%;
-            padding: 20px 50px;
+            left: 0;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--card-border);
+            padding: 40px 28px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            margin-bottom: 32px;
+        }
+
+        .profile-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--card-border);
+            margin-bottom: 16px;
+            display: flex;
             align-items: center;
-            background: rgba(2, 2, 4, 0.7);
-            backdrop-filter: blur(15px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .logo {
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        .logo::after { content: '_'; animation: blink 1s infinite; color: var(--accent-color); }
-
-        .nav-links { display: flex; gap: 40px; }
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
-            position: relative;
-        }
-        .nav-links a:hover { color: var(--text-primary); }
-
-        /* --- HERO --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
-            padding: 0 8%;
-        }
-        .hero h2.intro { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.2rem; margin-bottom: 20px; }
-        .hero h1 { font-size: 5rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px; letter-spacing: -2px; }
-        .hero h2.role { font-size: 3rem; color: var(--text-secondary); margin-bottom: 30px; opacity: 0.8; }
-        .hero p { max-width: 550px; font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 50px; background: rgba(0,0,0,0.4); padding: 10px; border-left: 3px solid var(--accent-color); }
-        
-        .cta-container { display: flex; gap: 20px; }
-        .btn { border-radius: 8px; padding: 15px 35px; border: 1px solid var(--accent-color); color: var(--accent-color); text-decoration: none; font-family: var(--font-mono); font-weight: 700; transition: all 0.3s; background: rgba(0, 243, 255, 0.05); }
-        .btn:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 30px rgba(0, 243, 255, 0.4); }
-
-        /* --- STATS --- */
-        .stats-bar { display: flex; justify-content: space-around; padding: 60px 10%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); margin-bottom: 50px; }
-        .stat-num { font-family: var(--font-mono); font-size: 2.5rem; font-weight: 700; color: var(--text-primary); display: block; text-align: center; }
-        .stat-label { font-size: 0.85rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; }
-
-        /* --- SECTIONS --- */
-        section { padding: 80px 8%; }
-        .section-title { font-family: var(--font-mono); font-size: 2rem; margin-bottom: 60px; display: flex; align-items: center; }
-        .section-title span { color: var(--accent-color); margin-right: 15px; }
-        .section-title::after { content: ""; flex-grow: 1; height: 1px; background: linear-gradient(90deg, var(--card-border), transparent); margin-left: 20px; }
-
-        /* --- ACCORDION --- */
-        .accordion-item { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 25px; border-radius: 8px; overflow: hidden; transition: all 0.3s ease; }
-        .accordion-item:hover { border-color: var(--accent-color) }
-        .accordion-header { padding: 30px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .accordion-header h3 { font-size: 1.4rem; color: var(--accent-color); }
-        .accordion-meta { font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
-        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--terminal-bg); border-top: 1px solid rgba(255,255,255,0.05); }
-        .terminal-window { padding: 25px; font-family: var(--font-mono); font-size: 0.9rem; color: #d4d4d4; }
-        .terminal-line { display: flex; margin-bottom: 12px; }
-        .terminal-prompt { color: var(--accent-color); margin-right: 15px; }
-
-        /* --- SKILLS & EDUCATION --- */
-        .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .skill-box { background: var(--card-bg); padding: 30px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .skill-box h3 { color: var(--accent-color); margin-bottom: 20px; font-family: var(--font-mono); font-size: 1.1rem; }
-        .tech-list { display: flex; flex-wrap: wrap; gap: 12px; }
-        .tech-item { background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 4px; font-size: 0.9rem; transition: 0.3s; border: 1px solid transparent; }
-
-        /* Education Logos */
-        .edu-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px; }
-        .edu-logo-placeholder { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 2px solid var(--accent-color); }
-        .edu-logo-img { width: 80%; height: 80%; object-fit: contain; }
-        .edu-details .degree { color: var(--accent-color); font-family: var(--font-mono); font-size: 0.85rem; display: block; }
-        .edu-details h3 {font-size: 25px; margin-bottom: 0px;}
-        .edu-details .year { color: var(--text-secondary); font-size: 0.8rem; }
-
-        /* Projects */
-        .img-placeholder { width: 100%; height: 100%; border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; }
-        .img-placeholder:hover { border-color: var(--accent-color); background: rgba(0, 243, 255, 0.05); }
-.exp-content-wrapper {
-            display: grid;
-            /* Desktop: 55% Text, 45% Image */
-            grid-template-columns: 1.2fr 1fr; 
-            gap: 25px;
-            padding: 25px;
-        }
-
-        /* The text side (Terminal style) */
-        .exp-text-col {
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            color: #d4d4d4;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* The image side */
-        .exp-img-col {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-        }
-/* --- JOB CARD (ALWAYS OPEN) --- */
-        .job-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 40px; /* More spacing between big cards */
+            font-size: 1.8rem;
+            color: var(--text-tertiary);
             overflow: hidden;
-            transition: transform 0.3s, border-color 0.3s;
-            position: relative;
         }
 
-        .job-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-5px); /* Subtle lift effect */
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .job-header-static {
-            padding: 25px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(255, 255, 255, 0.01);
-        }
-
-        .job-header-static h3 {
-            font-size: 1.4rem;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .job-meta {
-            font-family: var(--font-mono); 
-            font-size: 0.9rem; 
-            color: var(--text-secondary); 
-        }
-        
-        .job-meta span.company { color: var(--accent-color); }
-
-        /* Reuse the Grid Layout we made earlier */
-        .exp-content-wrapper {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr; /* Text | Image */
-            gap: 30px;
-            padding: 30px;
-        }
-        .exp-content-wrapper1 {
-            display: grid;
-            /* grid-template-columns: 1.2fr 1fr; */
-            gap: 30px;
-            padding: 30px;
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .exp-content-wrapper {
-                display: flex;
-                flex-direction: column-reverse; /* Images on top on mobile */
-                gap: 20px;
-                padding: 20px;
-            }
-        }
-        /* Image styling */
-        .job-img {
-            width: 100%;
-            height: 100%; /* Fixed height for uniformity */
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            border-radius: 10px;
-            opacity: 1;
-            position: relative;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-        
-
-        .job-img img {
+        .profile-photo img {
             width: 100%;
             height: 100%;
-            /* object-fit: cover; */
-            opacity: 1.0;
-            border-radius: 10px;
-            transition: opacity 0.3s;
-        }
-        
-        /* .job-img:hover img { opacity: 1; } */
-/* --- NARRATIVE LOG STYLES --- */
-        .log-entry {
-            margin-bottom: 20px;
-            padding-left: 15px;
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            object-fit: cover;
         }
 
-        .log-header {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+        .sidebar h1 {
+            font-size: 2.0rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .sidebar .role {
+            font-size: 1.0rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        /* Sidebar Nav */
+        .sidebar-nav {
+            margin-bottom: 28px;
+        }
+
+        .sidebar-nav a {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 12px 14px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
 
-        .log-body {
-            font-size: 0.95rem;
+        .sidebar-nav a:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav a i {
+            width: 18px;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-nav a:hover i,
+        .sidebar-nav a.active i {
+            color: var(--accent-color);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            text-align: center;
+        }
+
+        .sidebar-footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-footer .footer-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer .footer-links a:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .sidebar-footer span {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
+        /* === MAIN CONTENT === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 48px 56px;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 72px;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            /* letter-spacing: 0.1em; */
+            color: var(--text-primary);
+        }
+
+        /* === INTRO SECTION === */
+        .intro {
+            margin-bottom: 56px;
+        }
+
+        .intro h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .intro p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .intro p strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* === GRID CARDS === */
+        .card-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: var(--text-tertiary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-secondary);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.04);
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 1.8rem;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-type {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card p {
+            font-size: 0.82rem;
             color: var(--text-secondary);
             line-height: 1.5;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
-        /* Color Coding */
-        .color-error { color: #ff4444; }    /* The Challenge */
-        .color-fix { color: var(--accent-color); }   /* The Solution */
-        .color-success { color: #00ff88; }  /* The Impact */
-        
-        .highlight-w { color: #fff; font-weight: 600; }
-        /* Label for placeholder images */
-        .img-label {
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .card-tag {
+            font-size: 0.62rem;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+        }
+
+        .card-stat {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Experience specific */
+        .exp-date {
+            font-size: 0.72rem;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+            margin-bottom: 6px;
+        }
+
+        /* === SKILLS ROW === */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .skill-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .skill-box h4 {
+            font-size: 1.0rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .skill-box h4 i {
+            color: var(--accent-color);
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skill-item {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            background: var(--bg-secondary);
+            border-radius: 5px;
+            color: var(--text-secondary);
+        }
+
+        /* === EDUCATION ROW === */
+        .education-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .edu-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 22px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .edu-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .edu-icon img {
+            width: 65%;
+            height: 65%;
+            object-fit: contain;
+        }
+
+        .edu-info h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .edu-info .degree {
+            font-size: 1.0rem;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .edu-info .year {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        /* === MODAL === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: var(--text-primary);
+            color: #fff;
+        }
+
+        .modal-image {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            overflow: hidden;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+            padding : 15px;
+            border-radius: 25px;
+        }
+
+        .carousel-btn {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--accent-color);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            text-align: center;
-            pointer-events: none; /* Let clicks pass through */
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            opacity: 0;
+            z-index: 10;
         }
-        /* Footer */
-        footer { text-align: center; padding: 80px 0; color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.85rem; }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        @media (max-width: 768px) { .hero h1 { font-size: 3rem; } section { padding: 60px 5%; } .nav-links { display: none; } .stats-bar { flex-direction: column; gap: 30px; } }
-        @media (max-width: 768px) {
-            .exp-content-wrapper {
-                display: flex;
-                /* REVERSE COLUMN: Puts the 2nd HTML element (Images) on TOP */
-                flex-direction: column-reverse; 
-                gap: 20px;
-                padding: 20px;
+        .modal-image:hover .carousel-btn {
+            opacity: 1;
+        }
+
+        .carousel-btn:hover {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        .carousel-btn.prev {
+            left: 12px;
+        }
+
+        .carousel-btn.next {
+            right: 12px;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .carousel-dot.active {
+            background: #fff;
+            transform: scale(1.2);
+        }
+
+        .modal-content {
+            padding: 0px 28px 28px 28px;
+        }
+
+        .modal-type {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+        }
+
+        .modal-content h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .modal-meta {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+            font-family: var(--font-mono);
+        }
+
+        .modal-content > p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+
+        .modal-section ul {
+            list-style: none;
+        }
+
+        .modal-section li {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .modal-section li:last-child {
+            border-bottom: none;
+        }
+
+        .modal-section li i {
+            color: var(--accent-color);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .modal-tag {
+            font-size: 0.73rem;
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .modal-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-link {
+            padding: 10px 18px;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .modal-link:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        .modal::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .problem-section h4 {
+            color: #B54A32;
+        }
+
+        .problem-section h4 i {
+            margin-right: 6px;
+        }
+
+        .solution-section h4 {
+            color: var(--accent-color);
+        }
+
+        .solution-section h4 i {
+            margin-right: 6px;
+        }
+
+        .results-section h4 {
+            color: #3D7A4A;
+        }
+
+        .results-section h4 i {
+            margin-right: 6px;
+        }
+
+        #modal-problem {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1200px) {
+            .card-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            .job-img {
-                height: 200px; /* Taller images for mobile impact */
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+                padding: 40px;
+            }
+            .card-grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            .education-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                padding: 28px 24px;
+            }
+            .sidebar-header {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            .profile-photo {
+                margin-bottom: 0;
+                width: 56px;
+                height: 56px;
+            }
+            .sidebar-nav {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                margin-bottom: 20px;
+            }
+            .sidebar-nav a {
+                white-space: nowrap;
+                padding: 10px 14px;
+                margin-bottom: 0;
+            }
+            .quick-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 28px 24px;
+            }
+            .card-grid-3 {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
-    <div id="bg-overlay"></div>
+    <div class="layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="profile-photo">
+                    <img src="edu/shared image.jpg" alt="Kaushik Deo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-user\'></i>';">
+                </div>
+                <div>
+                    <h1>Kaushik Deo</h1>
+                    <div class="role">Robotics Software Engineer</div>
+                </div>
+            </div>
 
-    <nav>
-        <div class="logo">Kaushik Deo</div>
-        <div class="nav-links">
-            <a href="#about">// About</a>
-            <a href="#experience">// Experience</a>
-            <a href="#projects">// Projects</a>
-            <a href="#education">// Education</a>
-            <a href="#contact">// Contact</a>
-        </div>
-    </nav>
+            <nav class="sidebar-nav">
+                <a href="#experience" class="active">
+                    <i class="fa-solid fa-briefcase"></i> Experience
+                </a>
+                <a href="#projects">
+                    <i class="fa-solid fa-diagram-project"></i> Projects
+                </a>
+                <a href="#skills">
+                    <i class="fa-solid fa-code"></i> Skills
+                </a>
+                <a href="#education">
+                    <i class="fa-solid fa-graduation-cap"></i> Education
+                </a>
+            </nav>
 
-    <div class="hero" id="about">
-        <h1>Kaushik Deo</h1>
-        <h2 class="role">Building Autonomous Systems</h2>
-        <p> Robotics Software Engineer specializing in <strong>SLAM, Perception, Planning and Sensor Fusion</strong>. 
-            Whether it's warehouse automation, field robotics, or autonomous inspection - I build systems that don't just 
-            work in simulation, but thrive in the real world.</p>
-        <div class="cta-container">
-            <a href="#experience" class="btn">View Work</a>
-            <a href="#contact" class="btn" style="background:transparent; color:#fff; border-color:#fff;">Contact Me</a>
-        </div>
+            <div class="sidebar-footer">
+                <div class="footer-links">
+                    <a href="https://www.linkedin.com/in/kaushik-deo-71bbaa1b1/" target="_blank" title="LinkedIn">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://www.github.com/kaushik884" target="_blank" title="GitHub">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+                    <a href="mailto:deo.ka@northeastern.edu" title="Email">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+                <span>Boston, MA · Open to Opportunities</span>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <div class="intro">
+                <!-- <h2>Robotics engineer bridging the gap between cutting edge research and real-world deployment.</h2> -->
+                <p><strong>Master's in Robotics at Northeastern University</strong>, I build localization and perception systems for robots that work in the real world -
+                     warehouses, outdoor environments, places where sensors get noisy and maps go stale. My work is at the intersection of <strong>perception, navigation, 
+                     and real-time systems.</strong> I've deployed camera-based localization systems for autonomous forklifts, running SLAM on edge hardware in dynamic
+                      warehouse environments. I've benchmarked Visual and LiDAR SLAM algorithms on Boston Dynamics Spot and Unitree robots. 
+                    I work primarily in <strong>C++ and Python, with ROS2</strong> and a lot of patience for debugging sensor noise. 
+                    Whether it's warehouse automation, field robotics, or autonomous inspection - I build systems that don't just work in simulation, but thrive when reality hits hard.</p>
+            </div>
+
+            <!-- EXPERIENCE -->
+            <section class="section" id="experience">
+                <div class="section-header">
+                    <h2 class="section-title">Experience</h2>
+                </div>
+
+                <div class="card-grid-2">
+                    
+                    <div class="card" onclick="openModal('arcbest')">
+                        <div class="card-image">
+                            <img src="covers/forklift.jpg" alt="Vaux Vision" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-warehouse\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <h3>Robotics Software Engineer Intern</h3>
+                            <div class="card-type">ArcBest Technologies</div>
+                            <div class="exp-date">Jun 2025 - Aug 2025</div>
+                            <p>Vaux Vision RTLS: A Camera-based Real-time Localization System for Autonomous Forklifts in GPS-denied warehouse environments.</p>
+                            <div class="card-meta">
+                                <div class="card-tags">
+                                    <span class="card-tag">RTAB-Map SLAM</span>
+                                    <span class="card-tag">Camera-IMU Calibration</span>
+                                    <span class="card-tag">ROS2</span>
+                                    <span class="card-tag">Python, C++</span>
+                                    <span class="card-tag">Docker</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('synapse')">
+                        <div class="card-image">
+                            <img src="covers/robots.png" alt="SLAM Research" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-robot\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <h3>Robotics Research Assistant</h3>
+                            <div class="card-type">Northeastern University</div>
+                            <div class="exp-date">Jan 2025 - Apr 2025</div>
+                            <p>Research grade dataset generation for SLAM benchmark using Boston Dynamics and Unitree robots.</p>
+                            <div class="card-meta">
+                                <div class="card-tags">
+                                    <span class="card-tag">Multi-Sensor Calibration</span>
+                                    <span class="card-tag">Camera, LiDAR, GPS, IMU</span>
+                                    <span class="card-tag">Nvidia Jetson</span>
+                                    <span class="card-tag">SLAM</span>
+                                    <span class="card-tag">ROS/ROS2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
+            
+            <!-- PROJECTS -->
+            <section class="section" id="projects">
+                <div class="section-header">
+                    <h2 class="section-title">Projects</h2>
+                </div>
+                
+                <div class="card-grid-3">
+                    
+                    <div class="card" onclick="openModal('icp')">
+                        <div class="card-image">
+                            <img src="covers/cloud.jpg" alt="ICP" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-circle-nodes\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">SLAM</div>
+                            <h3>LiDAR SLAM from scratch</h3>
+                            <p>Point-to-Point and Point-to-Plane LiDAR ICP with loop closure and pose graph optimization.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">C++</span>
+                                <span class="card-tag">Eigen</span>
+                                <span class="card-tag">GTSAM</span>
+                                <span class="card-tag">Optimization</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="openModal('traj')">
+                        <div class="card-image">
+                            <img src="covers/drone_main.png" alt="Trajectory" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-drone\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Motion Planning</div>
+                            <h3>Drone Trajectory Optimization</h3>
+                            <p>RRT path planning with 6-DOF dynamics and SLSQP optimization.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">GTSAM</span>
+                                <span class="card-tag">Physics</span>
+                                <span class="card-tag">Non-Linear Optimization</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('calib')">
+                        <div class="card-image">
+                            <img src="covers/calib_main.png" alt="Calibration" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-bullseye\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Calibration</div>
+                            <h3>Camera-LiDAR Calibration</h3>
+                            <p>Targetless spatio-temporal calibration using segmented vehicles with dual loss.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">OpenCV</span>
+                                <span class="card-tag">Semantic Segmentation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('sfm')">
+                        <div class="card-image">
+                            <img src="covers/3D_main.jpg" alt="3D Reconstruction" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-cube\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Computer Vision</div>
+                            <h3>Multi-Image 3D Reconstruction</h3>
+                            <p>Complete SfM pipeline with feature matching, pose estimation, and bundle adjustment.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Feature Matching</span>
+                                <span class="card-tag">OpenCV</span>
+                                <span class="card-tag">SfM</span>
+                                <span class="card-tag">GTSAM</span>
+                            </div>
+                        </div>
+                    </div>                    
+
+                    <div class="card" onclick="openModal('posegraph')">
+                        <div class="card-image">
+                            <img src="covers/pose_main.jpg" alt="Pose Graph" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-project-diagram\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Optimization</div>
+                            <h3>Pose Graph Optimization</h3>
+                            <p>Camera pose graph from 250+ images with GTSAM bundle adjustment.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">OpenCV</span>
+                                <span class="card-tag">LM Optimization</span>
+                                <span class="card-tag">GTSAM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('kalman')">
+                        <div class="card-image">
+                            <img src="covers/kalman_main.jpg" alt="Sensor Fusion" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-route\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Sensor Fusion</div>
+                            <h3>GPS-IMU Kalman Filter</h3>
+                            <p>8-state EKF fusing 200Hz IMU with 8Hz GPS. Dead reckoning through 460s tunnel.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">C++</span>
+                                <span class="card-tag">EKF</span>
+                                <span class="card-tag">ROS2</span>
+                                <span class="card-tag">Sensor Fusion</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('rl')">
+                        <div class="card-image">
+                            <img src="covers/env_main.jpg" alt="Reinforcement Learning" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-cube\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Reinforcement Learning</div>
+                            <h3>Reinforcement Learning Algorithms from Scratch</h3>
+                            <p>Comparative analysis of PPO and SAC RL algortihms and performance evaluation.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">PyTorch</span>
+                                <span class="card-tag">PPO</span>
+                                <span class="card-tag">SAC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('llm')">
+                        <div class="card-image">
+                            <img src="covers/LLM.jpg" alt="LLM Fine-tuning for AI Math Olympiad Questions" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-cube\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">LLMs and AI</div>
+                            <h3>LLM Fine-tuning for AI Math Olympiad Questions</h3>
+                            <p>Fine-tuning Qwen2.5B and Deepseek7B models for optimal response generation.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">PyTorch</span>
+                                <span class="card-tag">LLMs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" onclick="openModal('space')">
+                        <div class="card-image">
+                            <img src="covers/game_main.jpg" alt="Space Invaders" onerror="this.parentElement.innerHTML='<div class=\'card-image-placeholder\'><i class=\'fa-solid fa-cube\'></i></div>'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-type">Game Development</div>
+                            <h3>Space Invaders</h3>
+                            <p>Space Invaders 2D game from scratch.</p>
+                            <div class="card-tags">
+                                <span class="card-tag">Python</span>
+                                <span class="card-tag">Pygame</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SKILLS -->
+            <section class="section" id="skills">
+                <div class="section-header">
+                    <h2 class="section-title">Skills</h2>
+                </div>
+
+                <div class="skills-grid">
+                    <div class="skill-box">
+                        <h4><i class="fa-solid fa-code"></i> Languages</h4>
+                        <div class="skill-list">
+                            <span class="skill-item">Python</span>
+                            <span class="skill-item">C++</span>
+                            <span class="skill-item">MATLAB</span>
+                            <span class="skill-item">C#</span>
+                            <span class="skill-item">SQL</span>
+                            <span class="skill-item">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="skill-box">
+                        <h4><i class="fa-solid fa-toolbox"></i> Technologies</h4>
+                        <div class="skill-list">
+                            <span class="skill-item">Perception</span>
+                            <span class="skill-item">Planning</span>
+                            <span class="skill-item">SLAM</span>
+                            <span class="skill-item">Reinforcement Learning</span>
+                            <span class="skill-item">Machine Learning</span>
+                            <span class="skill-item">Sensor Fusion</span>
+                            <span class="skill-item">Sensor Calibration</span>
+                        </div>
+                    </div>
+                    <div class="skill-box">
+                        <h4><i class="fa-solid fa-robot"></i> Robotics</h4>
+                        <div class="skill-list">
+                            <span class="skill-item">ROS/ROS2</span>
+                            <span class="skill-item">PyBullet</span>
+                            <span class="skill-item">Gazebo</span>
+                            <span class="skill-item">Foxglove</span>
+                            <span class="skill-item">Rviz/Rviz2</span>
+                            <span class="skill-item">OpenAI Gymnasium</span>
+                        </div>
+                    </div>
+                    <div class="skill-box">
+                        <h4><i class="fa-solid fa-toolbox"></i> Tools</h4>
+                        <div class="skill-list">
+                            <span class="skill-item">Docker</span>
+                            <span class="skill-item">Linux</span>
+                            <span class="skill-item">Git</span>
+                            <span class="skill-item">PyTorch</span>
+                            <span class="skill-item">TensorFlow</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EDUCATION -->
+            <section class="section" id="education">
+                <div class="section-header">
+                    <h2 class="section-title">Education</h2>
+                </div>
+
+                <div class="education-grid">
+                    <div class="edu-card">
+                        <div class="edu-icon">
+                            <img src="edu/nu.png" alt="NEU" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-graduation-cap\' style=\'color: var(--text-tertiary)\'></i>'">
+                        </div>
+                        <div class="edu-info">
+                            <h4>Northeastern University</h4>
+                            <div class="degree">M.S. Robotics & Computer Science</div>
+                            <div class="year">2024 - 2026 | Boston, MA</div>
+                        </div>
+                    </div>
+                    <div class="edu-card">
+                        <div class="edu-icon">
+                            <img src="edu/sppu.png" alt="SPPU" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-graduation-cap\' style=\'color: var(--text-tertiary)\'></i>'">
+                        </div>
+                        <div class="edu-info">
+                            <h4>Savitribai Phule Pune University</h4>
+                            <div class="degree">B.E. Mechanical Engineering</div>
+                            <div class="year">2018 - 2022 | Pune, India</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
 
-    <section id="experience">
-        <h2 class="section-title"><span>01.</span> Experience</h2>
-        
-        <div class="accordion-item active" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Robotics Software Engineer Intern</h3>
-                    <div class="accordion-meta">
-                        <span class="company">ArcBest Technologies</span> | Jun 2025 - Aug 2025
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color);"></i>
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-image" id="modal-image">
+                <img id="modal-img" src="" alt="">
+                <button class="carousel-btn prev" onclick="prevImage(event)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="carousel-btn next" onclick="nextImage(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="carousel-dots" id="carousel-dots"></div>
             </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        <div class="log-entry" style="border-left-color: #ff4444;">
-                            <div class="log-header color-error">
-                                <i class="fa-solid fa-triangle-exclamation"></i> [PROBLEM STATEMENT]
-                            </div>
-                            <div class="log-body">
-                                How would an Autonomous Forklift know where a package is supposed to be stored in a warehouse? 
-                                GPS is denied indoors. Standard odometry drifts significantly on repetitive warehouse floors. 
-                                We needed <span class="highlight-w">sub-30cm accuracy</span> for efficient forklift navigation 
-                                but at a fraction of the cost of expensive LiDAR based packages.
-                            </div>
-                        </div>
-
-                        <div class="log-entry" style="border-left-color: var(--accent-color);">
-                            <div class="log-header color-fix">
-                                <i class="fa-solid fa-code"></i> [SOLUTION ENGINEERED]
-                            </div>
-                            <div class="log-body">
-                                Built <span class="highlight-w">Vaux Vision: RTLS</span> — a custom <span class="highlight-w"> Camera-based Localization System</span>. 
-                            </div>
-                            <div class="log-body">
-                                We executed the open-source SLAM package: <span class="highlight-w"> RTAB-Map (Visual-Inertial SLAM)</span> 
-                                in easy to deploy <span class="highlight-w">Docker containers</span> to handle the repetitive scenery. We optimized the pipeline
-                                to make it robust enough to tackle dynamic and repetitive environments.
-                            </div>
-                            <div class="log-body">
-                                Since warehouse environments are ever changing, we implemented <span class="highlight-w"> dynamic 2D and 3D mapping</span> buy overwriting 
-                                the map wherever new scenes and features are detected. 
-                            </div>
-                            <div class="log-body">
-                                Warehouses are huge (ours was around <span class="highlight-w">300,000 sqft</span>), yet we were able to generate the detailed 
-                                3D and 2D map of the entire  warehouse using efficient memory management, robust re-localization and high speen in under 1 hour.
-                            </div>
-                        </div>
-
-                        <div class="log-entry" style="border-left-color: #00ff88;">
-                            <div class="log-header color-success">
-                                <i class="fa-solid fa-check-circle"></i> [RESULTS ACHIEVED]
-                            </div>
-                            <div class="log-body">Succeded in having <span class="highlight-w">sub-10 cm accuracy </span>for precise navigation and localization.</div>
-                            <div class="log-body">Implemented dynamic mapping while using less than <span class="highlight-w"> 50% compute power.</span></div>
-                            <div class="log-body">Reached forklift operation <span class="highlight-w">speeds of above 10 mph</span> during mapping and localization.</div>
-                            <div class="log-body">Achieved <span class="highlight-w">95% relocalization confidence </span>in diverse warehouse environments.</div>
-                        </div>
-
+            <div class="modal-content">
+                <div class="modal-type" id="modal-type"></div>
+                <h2 id="modal-title"></h2>
+                <div class="modal-meta" id="modal-meta"></div>
+                <p id="modal-description"></p>
+                
+                <!-- Experience-specific sections (hidden for projects) -->
+                <div id="experience-sections">
+                    <div class="modal-section problem-section">
+                        <h4><i class="fa-solid fa-triangle-exclamation"></i> Problem</h4>
+                        <p id="modal-problem"></p>
                     </div>
-
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="rtab.png" alt="Forklift Perception" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="map.png" alt="SLAM Map" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="confidence.png" alt="SLAM Map" onerror="this.style.display='none'">
-                        </div>
+                    <div class="modal-section solution-section">
+                        <h4><i class="fa-solid fa-code"></i> Solution</h4>
+                        <ul id="modal-solution"></ul>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Robotics Research Assistant</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Silicon Synapse Labs, Northeastern University</span> | Jan 2025 - Apr 2025
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-entry" style="border-left-color: #ff4444;">
-                            <div class="log-header color-error">
-                                <i class="fa-solid fa-triangle-exclamation"></i> [THE MOTIVATION]
-                            </div>
-                            <div class="log-body">
-                                Whenever any major SLAM related algorithm is developed, it is benchmarked on the world renowned EuRoC and KITTI datasets. We wanted to 
-                                create our own <span class="highlight-w">research level, benchmark capable dataset</span> that will be used in the industry.
-                            </div>
-                        </div>
-
-                        <div class="log-entry" style="border-left-color: var(--accent-color);">
-                            <div class="log-header color-fix">
-                                <i class="fa-solid fa-flask"></i> [EXPERIMENTAL SETUP]
-                            </div>
-                            <div class="log-body">
-                                Started by making the <span class="highlight-w"> universal setup rig</span> that could be mounted on all different types of robots. 
-                                It included <span class="highlight-w"> IMUs, Stereo Camera pair, Velodyne LiDAR, GNSS GPS </span>running on a Nvidia 
-                                <span class="highlight-w">Jetson Orin NX.</span> 
-                            </div>
-                            <div class="log-body">
-                                We performed IMU calibraion, multi-camera intrinsic and extrinsic calibration, LiDAR spatio-temporal 
-                                calibration along with <span class="highlight-w"> time-syncing all sensors </span> to have a unified data stream. 
-                            </div>
-                            <div class="log-body">
-                                We used the <span class="highlight-w"> Boston Dynamics SPOT, Unitree Go2, Unitree B2-W robots and RC cars </span> to perform data collection 
-                                ensuring different quality of data resulting from different moving patterns of each robots.
-                            </div>
-                        </div>
-
-                        <div class="log-entry" style="border-left-color: #00ff88;">
-                            <div class="log-header color-success">
-                                <i class="fa-solid fa-file-waveform"></i> [FINDINGS]
-                            </div>
-                            <div class="log-body">
-                                Benchmarked the <span class="highlight-w"> ORB-SLAM 3, RTAB-Map </span>visual SLAM and <span class="highlight-w"> Fast-LIO 2,
-                                     LIO-SAM </span> LiDAR based SLAM algorithms on the collected dataset.
-                            </div>
-                            <div class="log-body">
-                                Performed detailed comparitive analysis, identifying strengths and limitations by analysing <span class="highlight-w">trajectory errors, 
-                                drift rate and runtime computation metrics.</span> 
-                            </div>
-                            <div class="log-body">
-                                <span class="highlight-w">Mapped 15 Acres </span>of Northeastern University campus.    
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="setup.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="slam.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section id="projects">
-        <h2 class="section-title"><span>02.</span> Projects</h2>
-        
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Autonomous Drone Path Planning and Trajectory Optimization</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Generating a collision free, physics based trajectory using RRT planning algorithm and optimizing it for a jerk-free smooth path</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [RRT Path Planning Algorithm Implementation]
-                        </div>
-                        <div class="log-body">
-                            <p>> Developed Rapidly-Exploring Random Tree (RRT) algorithm with vectorized nearest-neighbor search for 3D navigation, achieving O(N) complexity reduction through NumPy optimization.</p>
-                            <p>> Implemented probabilistic sampling with 20% goal-bias and terminal velocity-based steering to accelerate convergence while respecting quadrotor flight physics. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Drone Dynamics & Physics Modeling]
-                        </div>
-                        <div class="log-body">
-                            <p>> Designed 6-DOF kinematic models with ZYX Euler angle rotations, thrust-to-force transformations, and terminal velocity calculations from quadratic drag. </p>
-                            <p>> Built gravity-compensated force computations in body and navigation frames using GTSAM library for SO(3)/SE(3) operations. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Direct Transcription Trajectory Optimization with Custom Cost Functions]
-                        </div>
-                        <div class="log-body">
-                            <p>> Formulated multi-objective cost function balancing thrust deviation, angular velocity penalties, control smoothness (jerk minimization), and gimbal lock avoidance near singularities. </p>
-                            <p>> Implemented constraint framework with 6N dynamics equality constraints, 9 boundary conditions, and collision avoidance inequalities with 0.5m safety margins.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Nonlinear Optimization with SLSQP & Constraint Handling]
-                        </div>
-                        <div class="log-body">
-                            <p>> Solved 10N+6 dimensional optimization using Sequential Least Squares Programming with trust-region fallback, achieving convergence within 50 iterations through RRT-initialized linear interpolation.</p>
-                            <p>> Enforced boundary constraints for initial pose and goal position with angle-wrapping for Euler angles, meeting acceptance criteria of ||c_eq||∞ < 0.01</p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="traj.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="drone.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Multi-Image 3D Reconstruction</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Performing sparse 3D Reconstruction of any object for generating virtual scenarios</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [Image data resizing and cleaning]
-                        </div>
-                        <div class="log-body">
-                            <p>> Converted all images to greyscale and resized all images to 800x600 size for uniformity.</p>
-                            <p>> Applied CLAHE normalization to images to increase image constrast for better feature detection.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Feature Detection and Feature Matching]
-                        </div>
-                        <div class="log-body">
-                            <p>> Benchmarked geometric methods like SIFT, ORB and ML based methods like Superpoint for feature detection.</p>
-                            <p>> Tested geometric feature matching methods like Brute Force Matcher and K-Nearest-Neighbour Matcher and LightGlue ML matcher. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Triangulation and Pose Recovery]
-                        </div>
-                        <div class="log-body">
-                            <p>> Calculated homography and angle warp between image pairs. </p>
-                            <p>> Calculated Essential Matrix and Fundamental Matrix between image pairs to find epipolar constraints between images. </p>
-                            <p>> Performed triangulation of image pairs to calculate the distance between camera poses resulting in the initial camera pose graph. </p>
-                            <p>> Performed LM optimization using GTSAM for optimizing camera poses. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [3D Reconstruction]
-                        </div>
-                        <div class="log-body">
-                            <p>> Computed best matching pair based on maximum number of inliers. </p>
-                            <p>> Triangulated the initial 3D points generated from the first image pair. </p>
-                            <p>> Added each new camera pose and points based on best point matches using RANSAC and PnP. </p>
-                            <p>> Performed LM optimization using GTSAM for optimizing the new 3D points and camera poses. </p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="buddha.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="3d.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Pose Graph Optimization</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Generating a camera pose graph from 250+ images and perform GTSAM optimization for accurate camera trajectory</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [Image data resizing and cleaning]
-                        </div>
-                        <div class="log-body">
-                            <p>> Converted all images to greyscale and resized all images to 800x600 size for uniformity.</p>
-                            <p>> Applied CLAHE normalization to images to increase image constrast for better feature detection.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Feature Detection and Feature Matching]
-                        </div>
-                        <div class="log-body">
-                            <p>> Benchmarked geometric methods like SIFT, ORB and ML based methods like Superpoint for feature detection.</p>
-                            <p>> Tested geometric feature matching methods like Brute Force Matcher and K-Nearest-Neighbour Matcher and LightGlue ML matcher. </p>
-                            <p>> Calculated homography and angle warp between image pairs to generate initial pose graph. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [GTSAM Bundle Adjustment]
-                        </div>
-                        <div class="log-body">
-                            <p>> Performed GTSAM based bundle adjustment using Levenberg Marquardt (LM) optmization. </p>
-                            <p>> Minimized the covariance matrix, re-calculated homography and performed loop-closures for optimized pose graph. </p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="29.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="graph.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Targetless Camera-LiDAR SpatioTemporal Calibration</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Implementing a dual loss function on segmented road vehicles to perform targetless Camera-LiDAR spatio-temporal calibration</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [Camera Image Segmentation and LiDAR point cloud Segmentation]
-                        </div>
-                        <div class="log-body">
-                            <p>> Integrated SalsaNext and DeepLabV3 models to segment vehicles in 3D point clouds and 2D images respectively.</p>
-                            <p>> Performed point to pixel and pixel to point correspondence mapping for spatio-temporal calibration.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Dual Loss Function Implementation]
-                        </div>
-                        <div class="log-body">
-                            <p>> Designed a dual loss function with DBSCAN clustering matching LiDAR points with image segmentation masks.</p>
-                            <p>> Converted temporal loss to spatial loss for joint spatio-temporal calibration.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Multi-Stage optimization]
-                        </div>
-                        <div class="log-body">
-                            <p>> Applied a multistage coarse-to-fine optimization strategy with weight scheduling for improved calibration accuracy.</p>
-                            <p>> Achieved a final calibration error of 2.6 cm spatial error and 10ms temproal error.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="before_calib.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="after_calib.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Sensor Fusion using Kalman Filter for Automotive Dead Reckoning</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Implementing a robust Kalman Filter for fusing GPS and IMU sensor data capable of performing in GPS-blackout environments </span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [IMU Calibration & Data Processing]
-                        </div>
-                        <div class="log-body">
-                            <p>> Parsed and synchronized asynchronous ROS bag data streams.</p>
-                            <p>> Implemented static bias calibration logic to identify and subtract accelerometer and gyroscope errors. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Sensor Fusion Algorithm Development]
-                        </div>
-                        <div class="log-body">
-                            <p>> Designed and implemented a custom 6-state Kalman Filter in Python to fuse high-frequency (200Hz) IMU data with low-frequency (8Hz) GPS updates. </p>
-                            <p>> The filter successfully estimated 2D pose (position, heading) and velocity by integrating body-frame
-                                 acceleration and angular velocity while correcting for drift using GPS measurements. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Dead Reckoning in GNSS-Denied Environments]
-                        </div>
-                        <div class="log-body">
-                            <p>> Engineered a robust state estimation pipeline capable of handling extended GPS signal outages.</p>
-                            <p>> Successfully tracked vehicle trajectory during a 460-second tunnel passage by shifting to IMU-based dead reckoning.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="bias.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="output.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Comparitive Analysis of Reinforcement Learning Algorithms</h3>
-                    <div class="accordion-meta">
-                        <span class="company">Performing a deep comparative analysis of state-of-the-art RL algorithms: Soft Actor-Critic and Proximal-Policy Optimization</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper">
-                    <div class="exp-text-col">
-                        
-                        <div class="log-header color-fix">
-                            [Reinforcement Learning Algorithm Evaluation]
-                        </div>
-                        <div class="log-body">
-                            <p>>Conducted a comparative analysis of Soft Actor-Critic (SAC) and Proximal Policy Optimization (PPO) across discrete, continuous, and hybrid environments (Taxi-v3, CartPole-v1, LunarLander-v2). </p>
-                            <p>>Evaluated algorithms based on cumulative rewards, training stability, and convergence speed to determine suitability for diverse control tasks. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Policy Optimization & Performance Analysis]
-                        </div>
-                        <div class="log-body">
-                            <p>> Designed and trained RL agents to solve complex tasks, demonstrating SAC's superiority in high-dimensional continuous control environments like LunarLander-v2 due to entropy-based exploration. </p>
-                            <p>>Identified PPO's strength in stability and rapid convergence for simpler discrete tasks such as CartPole-v1. </p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Environment-Specific Strategy Implementation]
-                        </div>
-                        <div class="log-body">
-                            <p>> Analyzed algorithm behavior across varying state-action spaces, revealing PPO's struggles with reward variability in stochastic environments like Taxi-v3 versus SAC's robust long-term reward optimization. </p>
-                            <p>> Provided actionable insights for selecting RL algorithms based on task complexity and stability requirements.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="exp-img-col">
-                        <div class="job-img">
-                            <img src="env.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                        <div class="job-img">
-                            <img src="results.png" alt="Spot Robot" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="accordion-item" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-                <div>
-                    <h3>Fine-tuning LLMs for AI Maths Olympiad </h3>
-                    <div class="accordion-meta">
-                        <span class="company">Implementing fine-tuning on Qwen and DeepSeek SOTA LLMs to solve math olympiad level problems with accurate thinking process</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--accent-color)"></i>
-            </div>
-            
-            <div class="accordion-body">
-                <div class="exp-content-wrapper1">
-                    <div class="exp-text-col">
-                        <div class="log-header color-fix">
-                            [Data Engineering & Model Evaluation]
-                        </div>
-                        <div class="log-body">
-                            <p>> Curated and normalized diverse mathematical datasets, mapping problems to a uniform structure and implementing string parsing logic for consistent answer extraction. </p>
-                            <p>> Conducted comprehensive model evaluation on Olympiad-level problems, analyzing failure modes and leveraging insights to refine prompt engineering and decoding parameters.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [LLM Fine-Tuning & Optimization]
-                        </div>
-                        <div class="log-body">
-                            <p>> Fine-tuned the Qwen2.5-Math-1.5B-Instruct model using Low-Rank Adaptation (LoRA) to enhance mathematical reasoning capabilities with only 0.14% trainable parameters.</p>
-                            <p>> Implemented memory optimization techniques such as gradient checkpointing, mixed precision training (FP16), and dynamic padding to maximize efficiency on limited hardware.</p>
-                        </div>
-                        <div class="log-header color-fix">
-                            [Advanced Inference Strategy Development]
-                        </div>
-                        <div class="log-body">
-                            <p>> Designed a robust inference pipeline featuring chain-of-thought (CoT) prompting to guide step-by-step reasoning and enforce logical consistency.</p>
-                            <p>> Developed a temperature-based ensemble generation system with majority voting and multi-stage answer extraction to improve solution accuracy and reliability.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <section id="education">
-        <h2 class="section-title"><span>03.</span> Education</h2>
-        <div class="skills-container"> 
-            
-            <div class="skill-box">
-                <div class="edu-header">
-                    <div class="edu-logo-placeholder">
-                        <img src="nu.png" 
-                             alt="Northeastern University Logo" 
-                             class="edu-logo-img">
-                    </div>
-                    
-                    <div class="edu-details">
-                        <h3>Northeastern University</h3>
-                        <span class="degree">Master of Science, Robotics, Computer Science</span>
-                        <i class="fa-solid fa-university"></i>
-                        <span class="year">2024 - 2026</span>
+                    <div class="modal-section results-section">
+                        <h4><i class="fa-solid fa-check-circle"></i> Results</h4>
+                        <ul id="modal-results"></ul>
                     </div>
                 </div>
                 
-                <span class="course-label">Relevant Courses:</span>
-                <div class="tech-list">
-                    <div class="tech-item">Autonomous Field Robotics</div>
-                    <div class="tech-item">Robotics Sensing and Navigation</div>
-                    <div class="tech-item">Reinforcement Learning</div>
-                    <div class="tech-item">Foundations of AI</div>
-                    <div class="tech-item">Robotics Science and Systems</div>
-                </div>
-            </div>
-
-            <div class="skill-box">
-                <div class="edu-header">
-                    <div class="edu-logo-placeholder">
-                        <img src="sppu.png" 
-                             alt="SPPU Logo" 
-                             class="edu-logo-img">
-                    </div>
-                    
-                    <div class="edu-details">
-                        <h3>Savitribai Phule Pune University</h3>
-                        <span class="degree">Bachelor of Engineering, Mechanical Engineering</span>
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        <span class="year">2018 - 2022</span>
+                <!-- Project-specific sections (hidden for experience) -->
+                <div id="project-sections">
+                    <div class="modal-section">
+                        <h4>Key Highlights</h4>
+                        <ul id="modal-contributions"></ul>
                     </div>
                 </div>
-
-                <span class="course-label">Relevant Courses:</span>
-                <div class="tech-list">
-                    <div class="tech-item">Robotics</div>
-                    <div class="tech-item">Mechatronics</div>
-                    <div class="tech-item">Control Theory</div>
-                    <div class="tech-item">Robot Mechanics</div>
-                    <div class="tech-item">Numerical Methods for Optimization</div>
-                    <div class="tech-item">Fundamental Programming Languages</div>
+                
+                <div class="modal-section">
+                    <h4>Technologies</h4>
+                    <div class="modal-tags" id="modal-tags"></div>
                 </div>
+                <div class="modal-links" id="modal-links"></div>
             </div>
-
-        </div>
-    </section>
-
-    <section id="skills">
-        <h2 class="section-title"><span>04.</span> Tech Stack</h2>
-        <div class="skills-container">
-            
-            <div class="skill-box">
-                <h3><i class="fa-solid fa-code"></i> Languages</h3>
-                <div class="tech-list">
-                    <div class="tech-item"><i class="devicon-python-plain"></i> Python</div>
-                    <div class="tech-item"><i class="devicon-cplusplus-plain"></i> C++</div>
-                    <div class="tech-item"><i class="devicon-matlab-plain"></i> MATLAB</div>
-                    <div class="tech-item"><i class="devicon-csharp-plain"></i> C#</div>
-                    <div class="tech-item"><i class="devicon-mysql-plain"></i> SQL</div>
-                    <div class="tech-item"><i class="devicon-javascript-plain"></i> JavaScript</div>
-                </div>
-            </div>
-
-            <div class="skill-box">
-                <h3><i class="fa-solid fa-robot"></i> Robotics</h3>
-                <div class="tech-list">
-                    <div class="tech-item"><i class="fa-solid fa-circle-nodes"></i> ROS2</div>
-                    <div class="tech-item"><i class="fa-solid fa-map"></i> SLAM</div>
-                    <div class="tech-item"><i class="fa-solid fa-eye"></i> OpenCV</div>
-                    <div class="tech-item"><i class="fa-solid fa-cube"></i> Gazebo</div>
-                    <div class="tech-item"><i class="fa-solid fa-cube"></i> MuJoCo</div>
-                    <div class="tech-item"><i class="fa-solid fa-network-wired"></i> Sensor Fusion</div>
-                </div>
-            </div>
-
-            <div class="skill-box">
-                <h3><i class="fa-solid fa-toolbox"></i> Tools</h3>
-                <div class="tech-list">
-                    <div class="tech-item"><i class="devicon-docker-plain"></i> Docker</div>
-                    <div class="tech-item"><i class="devicon-linux-plain"></i> Linux</div>
-                    <div class="tech-item"><i class="devicon-git-plain"></i> Git</div>
-                    <div class="tech-item"><i class="devicon-foxglove-plain"></i> Foxglove</div>
-                    <div class="tech-item"><i class="devicon-rviz2-plain"></i> Rviz2</div>
-                    <div class="tech-item"><i class="devicon-pytorch-original"></i> PyTorch</div>
-                    <div class="tech-item"><i class="devicon-tensorflow-original"></i> TensorFlow</div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-    
-    <div class="stats-bar">
-        <div class="stat-item">
-            <span class="stat-num" data-target="15">0</span>
-            <span class="stat-label">Acres Mapped</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="10">0</span>
-            <span class="stat-label">cm Accuracy Achieved</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="95">0</span>
-            <span class="stat-label">% localization Accuracy Achieved</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="100">0</span>
-            <span class="stat-label">% Passion</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="100">0</span>
-            <span class="stat-label">Number of coffees drank</span>
         </div>
     </div>
 
-    <section id="contact" style="text-align: center">
-        <h2 style="font-size: 3rem; margin-bottom: 20px;">Ready to Collaborate?</h2>
-        <a href="mailto:deo.ka@northeastern.edu" class="btn" style="padding: 20px 50px; font-size: 1.2rem;">Initialize Contact</a>
-    </section>
-
-    <footer>
-        <div>Designed & Built by Kaushik Deo</div>
-        <div style="margin-top: 20px; font-size: 1.5rem;">
-            <a href="https://www.linkedin.com/in/kaushik-deo-71bbaa1b1/" target="_blank" style="color: var(--text-secondary); margin: 0 15px;"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://www.github.com/kaushik884" target="_blank" style="color: var(--text-secondary); margin: 0 15px;"><i class="fa-brands fa-github"></i></a>
-        </div>
-    </footer>
-
     <script>
-        function toggleAccordion(element) {
-            element.classList.toggle('active');
-            var body = element.querySelector('.accordion-body');
-            
-            // FIX: Look for 'fa-chevron-down' instead of 'fa-chevron-up'
-            var icon = element.querySelector('.fa-chevron-down');
-            
-            if (body.style.maxHeight) {
-                // CLOSING THE ITEM
-                body.style.maxHeight = null;
-                // Rotate back to 0deg (Pointing Down)
-                if(icon) icon.style.transform = "rotate(0deg)";
-            } else {
-                // OPENING THE ITEM
-                body.style.maxHeight = body.scrollHeight + "px";
-                // Rotate to 180deg (Pointing Up)
-                if(icon) icon.style.transform = "rotate(180deg)";
+        const data = {
+            arcbest: {
+                images: ['arcbest/rtab.png', 'arcbest/1.png', 'arcbest/2.png', 'arcbest/3.png', 'arcbest/4.png', 'arcbest/5.png'],
+                type: 'Experience · ArcBest Technologies',
+                title: 'Robotics Software Engineer Intern',
+                meta: 'Jun - Aug 2025 | Fort Smith, AR',
+                problem: 'How would an Autonomous Forklift know where a package is supposed to be stored in a warehouse? GPS is denied indoors. Standard odometry drifts significantly on repetitive warehouse floors. We needed sub-30cm accuracy for efficient forklift navigation but at a fraction of the cost of expensive LiDAR based packages.',
+                solution: [
+                    'Built Vaux Vision: RTLS - a custom Camera-based Localization System.',
+                    'We executed the open-source SLAM package: RTAB-Map (Visual-Inertial SLAM) in easy to deploy Docker containers to handle the repetitive scenery. We optimized the pipeline to make it robust enough to tackle dynamic and repetitive environments.',
+                    'Since warehouse environments are ever changing, we implemented dynamic 2D and 3D mapping buy overwriting the map wherever new scenes and features are detected.',
+                    'Warehouses are huge (ours was around 300,000 sqft), yet we were able to generate the detailed 3D and 2D map of the entire warehouse using efficient memory management, robust re-localization and high speen in under 1 hour.'
+                ],
+                results: [
+                    'Succeded in having sub-10 cm accuracy for precise navigation and localization.',
+                    'Implemented dynamic mapping while using less than 50% compute power.',
+                    'Reached forklift operation speeds of above 10 mph during mapping and localization.',
+                    'Achieved 95% relocalization confidence in diverse warehouse environments.'
+                ],
+                tags: ['RTAB-Map', 'Visual SLAM', 'Docker', 'ROS2', 'Python', 'C++'],
+                github: null
+            },
+            synapse: {
+                images: ['research/1.png', 'research/2.png', 'research/3.png'],
+                type: 'Experience · Northeastern University',
+                title: 'Robotics Research Assistant',
+                meta: 'Jan - Apr 2025 | Northeastern University',
+                problem: 'Whenever any major SLAM algorithm is developed, it is benchmarked on EuRoC and KITTI datasets. We wanted to create our own research-level, benchmark-capable dataset that will be used in the industry with diverse robot platforms and terrain.',
+                solution: [
+                    'Started by making the universal setup rig that could be mounted on all different types of robots. It included IMUs, Stereo Camera pair, Velodyne LiDAR, GNSS GPS running on a Nvidia Jetson Orin NX.',
+                    'We performed IMU calibration, multi-camera intrinsic and extrinsic calibration, LiDAR spatio-temporal calibration along with time-syncing all sensors to have a unified data stream.',
+                    'We used the Boston Dynamics SPOT, Unitree Go2, Unitree B2-W robots and RC cars to perform data collection ensuring different quality of data resulting from different moving patterns of each robots.'
+                ],
+                results: [
+                    'Benchmarked the ORB-SLAM 3, RTAB-Map visual SLAM and Fast-LIO 2, LIO-SAM LiDAR based SLAM algorithms on the collected dataset.',
+                    'Performed detailed comparative analysis, identifying strengths and limitations by analysing trajectory errors, drift rate and runtime computation metrics.',
+                    'Mapped 15 Acres of Northeastern University campus.'
+                ],
+                tags: ['Boston Dynamics', 'Unitree', 'Jetson Orin', 'ROS2', 'LiDAR', 'GNSS'],
+                github: null
+            },
+            icp: {
+                images: ['icp/after.png', 'icp/before.png', 'icp/full.png', 'icp/grid.png'],
+                type: 'Project · Point Cloud Processing',
+                title: 'ICP Point Cloud Registration from Scratch',
+                meta: 'Iterative Closest Point Algorithm',
+                description: 'From-scratch implementation of Iterative Closest Point algorithm for aligning 3D point clouds. Includes both point-to-point and point-to-plane variants with efficient spatial indexing.',
+                contributions: [
+                    'Implemented Point-to-Point ICP with configurable convergence criteria',
+                    'Built Point-to-Plane ICP variant for faster convergence on planar surfaces',
+                    'Created KD-tree spatial indexing for O(log n) nearest neighbor queries',
+                    'Achieved sub-centimeter alignment accuracy on benchmark datasets'
+                ],
+                tags: ['C++', 'Eigen', 'PCL', 'KD-Tree', 'SVD'],
+                github: 'https://github.com/kaushik884/LiDAR-ICP-Algorithm-from-scratch'
+            },
+            traj: {
+                images: ['drone/traj.png', 'drone/drone.png'],
+                type: 'Project · Motion Planning',
+                title: 'Drone Trajectory Optimization',
+                meta: 'RRT + Direct Transcription',
+                description: 'Collision-free trajectory generation for quadrotor navigation using RRT path planning followed by direct transcription optimization for smooth, physically-feasible paths.',
+                contributions: [
+                    'Developed Rapidly-Exploring Random Tree (RRT) algorithm with vectorized nearest-neighbor search for 3D navigation, achieving O(N) complexity reduction through NumPy optimization.',
+                    'Implemented probabilistic sampling with 20% goal-bias and terminal velocity-based steering to accelerate convergence while respecting quadrotor flight physics.',
+                    'Designed 6-DOF kinematic models with ZYX Euler angle rotations, thrust-to-force transformations, and terminal velocity calculations from quadratic drag.',
+                    'Built gravity-compensated force computations in body and navigation frames using GTSAM library for SO(3)/SE(3) operations.',
+                    'Formulated multi-objective cost function balancing thrust deviation, angular velocity penalties, control smoothness (jerk minimization), and gimbal lock avoidance near singularities.',
+                    'Implemented constraint framework with 6N dynamics equality constraints, 9 boundary conditions, and collision avoidance inequalities with 0.5m safety margins.',
+                    'Solved 10N+6 dimensional optimization using Sequential Least Squares Programming with trust-region fallback, achieving convergence within 50 iterations through RRT-initialized linear interpolation.',
+                    'Enforced boundary constraints for initial pose and goal position with angle-wrapping for Euler angles, meeting acceptance criteria of ||c_eq||∞ < 0.01'
+                ],
+                tags: ['Python', 'GTSAM', 'SE(3)', 'SLSQP', 'RRT', 'NumPy'],
+                github: 'https://github.com/kaushik884/Autonomous-Drone-Motion-Planning-and-Trajectory-Optimization'
+            },
+            calib: {
+                images: ['calib/before_calib.png', 'calib/after_calib.png'],
+                type: 'Project · Sensor Calibration',
+                title: 'Targetless Camera-LiDAR Spatio-Temporal Calibration',
+                meta: 'Dual Loss Function Optimization',
+                description: 'Automatic calibration system using segmented road vehicles as natural calibration targets. Dual loss function enables joint optimization of spatial and temporal alignment without manual intervention.',
+                contributions: [
+                    'Integrated SalsaNext and DeepLabV3 models to segment vehicles in 3D point clouds and 2D images respectively.',
+                    'Performed point to pixel and pixel to point correspondence mapping for spatio-temporal calibration.',
+                    'Designed a dual loss function with DBSCAN clustering matching LiDAR points with image segmentation masks.',
+                    'Converted temporal loss to spatial loss for joint spatio-temporal calibration.',
+                    'Applied a multistage coarse-to-fine optimization strategy with weight scheduling for improved calibration accuracy.',
+                    'Achieved a final calibration error of 2.6 cm spatial error and 10ms temproal error.'
+                ],
+                tags: ['SalsaNext', 'DeepLabV3', 'DBSCAN', 'PyTorch', 'Optimization'],
+                github: 'https://github.com/kaushik884/Targetless-Camera-Lidar-Calibration'
+            },
+            sfm: {
+                images: ['3d/buddha.png', '3d/3d.png', '3d/cam.png'],
+                type: 'Project · Computer Vision',
+                title: 'Multi-Image 3D Reconstruction',
+                meta: 'Structure from Motion Pipeline',
+                description: 'Complete Structure from Motion pipeline for sparse 3D reconstruction from unordered image collections. Implements feature detection, matching, pose estimation, triangulation, and bundle adjustment.',
+                contributions: [
+                    'Converted all images to greyscale and resized all images to 800x600 size for uniformity.',
+                    'Applied CLAHE normalization to images to increase image constrast for better feature detection.',
+                    'Benchmarked geometric methods like SIFT, ORB and ML based methods like Superpoint for feature detection.',
+                    'Tested geometric feature matching methods like Brute Force Matcher and K-Nearest-Neighbour Matcher and LightGlue ML matcher.',
+                    'Calculated homography and angle warp between image pairs.',
+                    'Calculated Essential Matrix and Fundamental Matrix between image pairs to find epipolar constraints between images.',
+                    'Performed triangulation of image pairs to calculate the distance between camera poses resulting in the initial camera pose graph.',
+                    'Performed LM optimization using GTSAM for optimizing camera poses.',
+                    'Computed best matching pair based on maximum number of inliers.',
+                    'Triangulated the initial 3D points generated from the first image pair.',
+                    'Added each new camera pose and points based on best point matches using RANSAC and PnP.',
+                    'Performed LM optimization using GTSAM for optimizing the new 3D points and camera poses.'
+                ],
+                tags: ['Python', 'GTSAM', 'OpenCV', 'SuperPoint', 'LightGlue', 'NumPy'],
+                github: 'https://github.com/kaushik884/3D-Reconstruction'
+            },
+            posegraph: {
+                images: ['pose/graph.png', 'pose/29.png'],
+                type: 'Project · Optimization',
+                title: 'Pose Graph Optimization',
+                meta: 'Bundle Adjustment with Loop Closure',
+                description: 'Camera pose graph construction from large image collections with GTSAM-based bundle adjustment. Implements loop closure detection for drift correction in long trajectories.',
+                contributions: [
+                    'Converted all images to greyscale and resized all images to 800x600 size for uniformity.',
+                    'Applied CLAHE normalization to images to increase image constrast for better feature detection.',
+                    'Benchmarked geometric methods like SIFT, ORB and ML based methods like Superpoint for feature detection.',
+                    'Tested geometric feature matching methods like Brute Force Matcher and K-Nearest-Neighbour Matcher and LightGlue ML matcher.',
+                    'Calculated homography and angle warp between image pairs to generate initial pose graph.',
+                    'Performed GTSAM based bundle adjustment using Levenberg Marquardt (LM) optmization.',
+                    'Minimized the covariance matrix, re-calculated homography and performed loop-closures for optimized pose graph.'
+                ],
+                tags: ['GTSAM', 'Levenberg-Marquardt', 'Python', 'OpenCV', 'Loop Closure'],
+                github: 'https://github.com/kaushik884/3D-Reconstruction'
+            },
+            kalman: {
+                images: ['kalman/1.png', 'kalman/2.png', 'kalman/tunnel.png'],
+                type: 'Project · Sensor Fusion',
+                title: 'GPS-IMU Sensor Fusion with Kalman Filter',
+                meta: 'Extended Kalman Filter for Dead Reckoning',
+                description: 'Robust state estimation system fusing high-frequency IMU data with low-frequency GPS updates. Capable of dead reckoning through extended GPS blackouts in challenging environments.',
+                contributions: [
+                    'Parsed and synchronized asynchronous ROS bag data streams.',
+                    'Implemented static bias calibration logic to identify and subtract accelerometer and gyroscope errors.',
+                    'Designed and implemented a custom 8-state Extended Kalman Filter in Python to fuse high-frequency (200Hz) IMU data with low-frequency (8Hz) GPS updates.',
+                    'The filter successfully estimated 2D pose (position, heading) and velocity by integrating body-frame acceleration and angular velocity while correcting for drift using GPS measurements.',
+                    'Engineered a robust state estimation pipeline capable of handling extended GPS signal outages.',
+                    'Successfully tracked vehicle trajectory during a 460-second tunnel passage by shifting to IMU-based dead reckoning.'
+                ],
+                tags: ['Python', 'Kalman Filter', 'ROS2', 'NumPy', 'IMU', 'GPS'],
+                github: 'https://github.com/kaushik884/GPS-IMU-Sensor-Fusion-using-Kalman-Filter'
+            },
+            rl: {
+                images: ['rl/cartpole.png', 'rl/cartpole1.png', 'rl/lunar.png', 'rl/lunar1.png', 'rl/taxi.png', 'rl/taxi1.png'],
+                type: 'Project · Reinforcement Learning',
+                title: 'Reinforcement Learning Algorithms from Scratch',
+                meta: 'PPO and SAC Implementation',
+                description: 'Comparative analysis of Proximal Policy Optimization (PPO) and Soft Actor-Critic (SAC) algorithms implemented from scratch. Evaluated performance on OpenAI Gymnasium environments.',
+                contributions: [
+                    'Conducted a comparative analysis of Soft Actor-Critic (SAC) and Proximal Policy Optimization (PPO) across discrete, continuous, and hybrid environments (Taxi-v3, CartPole-v1, LunarLander-v2).',
+                    'Evaluated algorithms based on cumulative rewards, training stability, and convergence speed to determine suitability for diverse control tasks.',
+                    'Designed and trained RL agents to solve complex tasks, demonstrating SAC\'s superiority in high-dimensional continuous control environments like LunarLander-v2 due to entropy-based exploration.',
+                    'Identified PPO\'s strength in stability and rapid convergence for simpler discrete tasks such as CartPole-v1.',
+                    'Analyzed algorithm behavior across varying state-action spaces, revealing PPO\'s struggles with reward variability in stochastic environments like Taxi-v3 versus SAC\'s robust long-term reward optimization.',
+                    'Provided actionable insights for selecting RL algorithms based on task complexity and stability requirements.'
+                ],
+                tags: ['Python', 'PyTorch', 'RL Algorithms', 'PPO', 'SAC'],
+                github: 'https://github.com/kaushik884/Proximal-Policy-Optimization-and-Soft-Actor-Critic-algorithms-on-Gym-environments'
+            },
+            llm: {
+                images: ['ai/text.png'],
+                type: 'Project · LLMs and AI',
+                title: 'LLM Fine-tuning for AI Math Olympiad Questions',
+                meta: 'Qwen2.5B and Deepseek7B Fine-tuning',
+                description: 'Fine-tuned large language models (Qwen2.5B and Deepseek7B) on curated mathematical problem datasets to enhance reasoning and solution generation for Math Olympiad-level questions.',
+                contributions: [
+                    'Curated and normalized diverse mathematical datasets, mapping problems to a uniform structure and implementing string parsing logic for consistent answer extraction.',
+                    'Conducted comprehensive model evaluation on Olympiad-level problems, analyzing failure modes and leveraging insights to refine prompt engineering and decoding parameters.',
+                    'Fine-tuned the Qwen2.5-Math-1.5B-Instruct model using Low-Rank Adaptation (LoRA) to enhance mathematical reasoning capabilities with only 0.14% trainable parameters.',
+                    'Implemented memory optimization techniques such as gradient checkpointing, mixed precision training (FP16), and dynamic padding to maximize efficiency on limited hardware.',
+                    'Designed a robust inference pipeline featuring chain-of-thought (CoT) prompting to guide step-by-step reasoning and enforce logical consistency.',
+                    'Developed a temperature-based ensemble generation system with majority voting and multi-stage answer extraction to improve solution accuracy and reliability.'
+                ],
+                tags: ['Python', 'PyTorch', 'Qwen2.5B', 'Deepseek7B', 'LLM Fine-tuning'],
+                github: 'https://github.com/kaushik884/AI-Maths-Olympiad'
+            },
+            space: {
+                images: ['space/2.png', 'space/1.png'],
+                type: 'Project · Game Development',
+                title: 'Space Exploration Game',
+                meta: 'Python and Pygame Development',
+                description: 'A 3D space exploration game built with Pygame featuring interactive environments.',
+                contributions: [
+                    'Developed a 3D space exploration game using Python and Pygame.',
+                    'Implemented interactive environments and engaging gameplay mechanics.',
+                    'Optimized performance for smooth user experience.'
+                ],
+                tags: ['Python', 'Pygame', '3D Graphics'],
+                github: 'https://github.com/kaushik884/Space-Invader'
             }
+        };
+
+        let currentImages = [];
+        let currentImageIndex = 0;
+
+        function updateCarouselImage() {
+            const img = document.getElementById('modal-img');
+            img.src = currentImages[currentImageIndex];
+            img.onerror = function() { this.style.display = 'none'; };
         }
 
-        const stats = document.querySelectorAll('.stat-num');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const target = +entry.target.getAttribute('data-target');
-                    let count = 0;
-                    const inc = target / 50; 
-                    const updateCount = () => { count += inc; if (count < target) { entry.target.innerText = Math.ceil(count); requestAnimationFrame(updateCount); } else { entry.target.innerText = target; } };
-                    updateCount(); observer.unobserve(entry.target);
+        function updateCarouselDots() {
+            const dotsContainer = document.getElementById('carousel-dots');
+            if (currentImages.length <= 1) {
+                dotsContainer.innerHTML = '';
+                document.querySelectorAll('.carousel-btn').forEach(btn => btn.style.display = 'none');
+                return;
+            }
+            document.querySelectorAll('.carousel-btn').forEach(btn => btn.style.display = 'flex');
+            dotsContainer.innerHTML = currentImages.map((_, i) => 
+                `<span class="carousel-dot ${i === currentImageIndex ? 'active' : ''}" onclick="goToImage(${i}, event)"></span>`
+            ).join('');
+        }
+
+        function prevImage(event) {
+            event.stopPropagation();
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            updateCarouselImage();
+            updateCarouselDots();
+        }
+
+        function nextImage(event) {
+            event.stopPropagation();
+            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+            updateCarouselImage();
+            updateCarouselDots();
+        }
+
+        function goToImage(index, event) {
+            event.stopPropagation();
+            currentImageIndex = index;
+            updateCarouselImage();
+            updateCarouselDots();
+        }
+
+        function openModal(id) {
+            const item = data[id];
+            const modal = document.getElementById('modal');
+            
+            // Set up carousel
+            currentImages = item.images;
+            currentImageIndex = 0;
+            updateCarouselImage();
+            updateCarouselDots();
+            
+            document.getElementById('modal-type').textContent = item.type;
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-meta').textContent = item.meta;
+            document.getElementById('modal-description').textContent = item.description;
+            
+            const isExperience = item.problem !== undefined;
+            
+            document.getElementById('experience-sections').style.display = isExperience ? 'block' : 'none';
+            document.getElementById('project-sections').style.display = isExperience ? 'none' : 'block';
+            
+            if (isExperience) {
+                document.getElementById('modal-problem').textContent = item.problem;
+                document.getElementById('modal-solution').innerHTML = item.solution.map(s => `<li><i class="fa-solid fa-chevron-right"></i>${s}</li>`).join('');
+                document.getElementById('modal-results').innerHTML = item.results.map(r => `<li><i class="fa-solid fa-check"></i>${r}</li>`).join('');
+            } else {
+                document.getElementById('modal-contributions').innerHTML = item.contributions.map(c => `<li><i class="fa-solid fa-check"></i>${c}</li>`).join('');
+            }
+            const tagsContainer = document.getElementById('modal-tags');
+            tagsContainer.innerHTML = item.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
+            
+            const linksContainer = document.getElementById('modal-links');
+            if (item.github) {
+                linksContainer.innerHTML = `<a href="${item.github}" target="_blank" class="modal-link"><i class="fa-brands fa-github"></i> View Code</a>`;
+            } else {
+                linksContainer.innerHTML = '';
+            }
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (document.getElementById('modal').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') prevImage(e);
+                if (e.key === 'ArrowRight') nextImage(e);
+            }
+        });
+
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
                 }
             });
         });
-        stats.forEach(stat => observer.observe(stat));
-
-        // =========================================================
-        // === THREE.JS: OUTDOOR TO WAREHOUSE TRANSITION LOGIC ===
-        // =========================================================
-        
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020204, 0.003);
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 40, 80);
-        camera.lookAt(0, 0, 0);
-
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-
-        // --- 1. SETUP POINTS ---
-        const particleCount = 25000;
-        const geometry = new THREE.BufferGeometry();
-        
-        // We need Arrays to store: 
-        // 1. Initial (Outdoor) Position
-        // 2. Target (Warehouse) Position
-        // 3. Initial Color
-        // 4. Target Color
-        
-        const initialPositions = new Float32Array(particleCount * 3);
-        const targetPositions = new Float32Array(particleCount * 3);
-        const initialColors = new Float32Array(particleCount * 3);
-        const targetColors = new Float32Array(particleCount * 3);
-        const currentPositions = new Float32Array(particleCount * 3);
-        const currentColors = new Float32Array(particleCount * 3);
-
-        const colorObj = new THREE.Color();
-
-        for (let i = 0; i < particleCount; i++) {
-            // --- OUTDOOR STATE (Wavy Terrain) ---
-            const x = (Math.random() - 0.5) * 300;
-            const z = (Math.random() - 0.5) * 300;
-            const y = Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8 + (Math.random() * 2);
-
-            initialPositions[i*3] = x;
-            initialPositions[i*3+1] = y;
-            initialPositions[i*3+2] = z;
-
-            // Outdoor Color: Rainbow based on height
-            const hNorm = (y + 10) / 20;
-            colorObj.setHSL(0.7 - (hNorm * 0.7), 1.0, 0.5);
-            initialColors[i*3] = colorObj.r;
-            initialColors[i*3+1] = colorObj.g;
-            initialColors[i*3+2] = colorObj.b;
-
-            // --- INDOOR STATE (Structured Warehouse) ---
-            // We divide points into: Floor (60%), Walls/Shelves (40%)
-            let tx, ty, tz;
-            let tr, tg, tb;
-
-            if (Math.random() > 0.8) {
-                // FLOOR: Flat grid
-                tx = (Math.random() - 0.5) * 150;
-                tz = (Math.random() - 0.5) * 150;
-                ty = -10; // Flat floor
-                
-                // Color: Dark Blue/Grid lines
-                if (Math.abs(tx) % 20 < 1 || Math.abs(tz) % 20 < 1) {
-                     colorObj.setHex(0x00f3ff); // Cyan Grid lines
-                } else {
-                     colorObj.setHex(0x111111); // Dark floor
-                }
-            } else {
-                // SHELVES & WALLS
-                // Create aisles: X positions at -40, -20, 20, 40
-                const aisle = Math.floor(Math.random() * 4) - 2; // -2, -1, 0, 1
-                let aisleX = (aisle + 0.5) * 40; 
-                
-                tx = aisleX + (Math.random() - 0.5) * 5; // Shelf width
-                tz = (Math.random() - 0.5) * 200; // Shelf length
-                ty = (Math.random() * 30) - 10; // Height (-10 to 20)
-                
-                // Color: Orange/Industrial for shelves
-                // Make layers
-                if (Math.abs(ty + 10) % 10 < 1) {
-                    colorObj.setHex(0xffaa00); // Orange shelf levels
-                } else {
-                    colorObj.setHex(0x555555); // Gray structure
-                }
-            }
-
-            targetPositions[i*3] = tx;
-            targetPositions[i*3+1] = ty;
-            targetPositions[i*3+2] = tz;
-            
-            targetColors[i*3] = colorObj.r;
-            targetColors[i*3+1] = colorObj.g;
-            targetColors[i*3+2] = colorObj.b;
-
-            // Initialize Current to Initial
-            currentPositions[i*3] = x;
-            currentPositions[i*3+1] = y;
-            currentPositions[i*3+2] = z;
-            currentColors[i*3] = initialColors[i*3];
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(currentPositions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(currentColors, 3));
-
-        const material = new THREE.PointsMaterial({
-            size: 0.6,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-
-        // --- 2. ROBOT SETUP ---
-        const robotGroup = new THREE.Group();
-        const chassis = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 6), new THREE.MeshBasicMaterial({ color: 0x111111 }));
-        const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4, 1.5, 6)), new THREE.LineBasicMaterial({ color: 0x00f3ff }));
-        chassis.add(edges);
-        const lidar = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.8, 16), new THREE.MeshBasicMaterial({ color: 0x333333 }));
-        lidar.position.y = 1.2;
-        const scanLine = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.9), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-        scanLine.position.set(0.4, 0.5, 0);
-        lidar.add(scanLine);
-        robotGroup.add(chassis);
-        robotGroup.add(lidar);
-        scene.add(robotGroup);
-
-        // --- 3. SCROLL & ANIMATION LOGIC ---
-        
-        let scrollPercent = 0;
-        let smoothedScroll = 0;
-
-        window.addEventListener('scroll', () => {
-            // Calculate how far down we are (0.0 to 1.0)
-            const bodyH = document.body.scrollHeight - window.innerHeight;
-            const rawProgress = window.scrollY / bodyH;
-
-            // --- CONFIGURATION ---
-            const startThreshold = 0.1;  // Start animation at 10% scroll
-            const speed = 0.20;          // Duration of animation (lower = faster)
-
-            // --- LOGIC ---
-            // 1. Subtract startThreshold: (rawProgress - 0.1)
-            // 2. Math.max(0, ...): Ensures value is 0 until we pass 10% (prevents negatives)
-            // 3. Divide by speed: Scales the transition
-            // 4. Math.min(..., 1.0): Caps the transition at 100%
-            scrollPercent = Math.min(Math.max(0, rawProgress - startThreshold) / speed, 1.0);
-        });
-
-        // Helper for terrain height (Outdoor logic)
-        function getTerrainHeight(x, z) { return Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8; }
-
-        // Helper: Linear Interpolation
-        function lerp(start, end, t) { return start * (1 - t) + end * t; }
-
-        let time = 0;
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', e => { mouseX = (e.clientX - window.innerWidth/2)*0.05; mouseY = (e.clientY - window.innerHeight/2)*0.05; });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.01;
-
-            // 1. Smooth Scroll Transition
-            // Lerp current scroll value to target for buttery smooth effect
-            smoothedScroll += (scrollPercent - smoothedScroll) * 0.75;
-
-            // 2. MORPH POINTS
-            const posAttr = points.geometry.attributes.position;
-            const colAttr = points.geometry.attributes.color;
-
-            // Only update if there is significant change or movement
-            for (let i = 0; i < particleCount; i++) {
-                const ix = i * 3;
-                
-                // Interpolate Position
-                posAttr.array[ix] = lerp(initialPositions[ix], targetPositions[ix], smoothedScroll);
-                posAttr.array[ix+1] = lerp(initialPositions[ix+1], targetPositions[ix+1], smoothedScroll);
-                posAttr.array[ix+2] = lerp(initialPositions[ix+2], targetPositions[ix+2], smoothedScroll);
-
-                // Interpolate Color
-                colAttr.array[ix] = lerp(initialColors[ix], targetColors[ix], smoothedScroll);
-                colAttr.array[ix+1] = lerp(initialColors[ix+1], targetColors[ix+1], smoothedScroll);
-                colAttr.array[ix+2] = lerp(initialColors[ix+2], targetColors[ix+2], smoothedScroll);
-            }
-            posAttr.needsUpdate = true;
-            colAttr.needsUpdate = true;
-
-            // 3. ROBOT MOVEMENT
-            // It moves in a Lissajous curve
-            const rX = Math.sin(time * 0.5) * 30;
-            const rZ = Math.cos(time * 0.3) * 40;
-            
-            // Look ahead
-            const nextX = Math.sin((time + 0.1) * 0.5) * 30;
-            const nextZ = Math.cos((time + 0.1) * 0.3) * 40;
-
-            // ROBOT HEIGHT LOGIC:
-            // Outdoor: y = terrainHeight + 2.5
-            // Indoor: y = -10 (Flat floor) + 2.5
-            const terrainY = getTerrainHeight(rX, rZ);
-            const floorY = -10;
-            
-            // Blend robot height based on scroll
-            const currentY = lerp(terrainY, floorY, smoothedScroll) + 2.5;
-            const lookY = lerp(getTerrainHeight(nextX, nextZ), floorY, smoothedScroll) + 2.5;
-
-            robotGroup.position.set(rX, currentY, rZ);
-            robotGroup.lookAt(nextX, lookY, nextZ);
-
-            // 4. GENERAL SCENE
-            points.rotation.y += 0.002; // Very slow rotate
-            lidar.rotation.y += 0.2;
-            
-            // Camera Sway
-            camera.position.x += (mouseX - camera.position.x) * 0.02;
-            camera.position.y += (40 + mouseY * 0.2 - camera.position.y) * 0.02;
-            camera.lookAt(0, 0, 0);
-
-            renderer.render(scene, camera);
-        }
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        animate();
     </script>
+
 </body>
 </html>
